@@ -1,27 +1,28 @@
-import { Container, DisplayObject, Point, Polygon } from 'pixi.js'
+import { Assets, Container, DisplayObject, Point, Polygon, Rectangle, Sprite, Texture } from 'pixi.js'
 
 import Tile from './Tile'
 
 import Wall from '../wall/Wall'
-
 import WallDirections from '../wall/WallDirectionEnum'
 
-import { cartesianToIsometric } from '../utils/coordinateConversions'
+import { cartesianToIsometric } from '../../utils/coordinateTransformations'
 
-import { TILE_GRID, TILE_SURFACE_POINTS } from './Tile.constants'
+import Point3D from '../../utils/Point3D'
+
+import { TILE_DIMENSIONS, TILE_GRID, TILE_SURFACE_POINTS } from './Tile.constants'
 
 /**
  * Represents a tilemap containing a grid of tiles and walls.
  */
 class Tilemap {
-    private container: Container
+    private tileContainer: Container
 
     /**
      * Creates a new Tilemap instance.
      */
-    constructor() {
+    constructor(private wallContainer: Container) {
         // Initialize a Pixi.js container to hold the tilemap graphics.
-        this.container = new Container()
+        this.tileContainer = new Container()
 
         // Generate the tilemap based on the TILE_GRID configuration.
         this.generate()
@@ -30,24 +31,22 @@ class Tilemap {
     /**
      * Generates the tilemap based on the TILE_GRID configuration.
      */
-    private generate() {
+    private async generate() {
         TILE_GRID.forEach((row, rowIndex) => {
-            row.forEach((shouldAddTile, columnIndex) => {
-                if (!shouldAddTile) return
+            row.forEach((height, columnIndex) => {
+                if (height === null) return
 
                 // Calculate the isometric position of the current tile.
-                const isometricPosition = this.calculateIsometricPosition(rowIndex, columnIndex)
-
-                // Add a tile to the tilemap.
-                this.addTile(isometricPosition)
+                const isometricPosition = this.calculateIsometricPosition(rowIndex, columnIndex, height)
 
                 // Determine if a wall should be added to the tilemap.
                 const wallDirection = this.getWallDirection(rowIndex, columnIndex)
 
-                if (wallDirection === undefined) return
-
                 // Add a wall to the tilemap.
-                this.addWall(isometricPosition, wallDirection)
+                if (wallDirection !== undefined) this.addWall(isometricPosition, wallDirection)
+
+                // Add a tile to the tilemap.
+                this.addTile(isometricPosition)
             })
         })
     }
@@ -58,8 +57,8 @@ class Tilemap {
      * @param y - The y position of the tile.
      * @returns The isometric position as a Point.
      */
-    private calculateIsometricPosition(x: number, y: number): Point {
-        const position = new Point(x, y)
+    private calculateIsometricPosition(x: number, y: number, z: number) {
+        const position = new Point3D(x, y, z)
 
         return cartesianToIsometric(position)
     }
@@ -68,10 +67,10 @@ class Tilemap {
      * Adds a tile to the tilemap.
      * @param position - The position of the tile.
      */
-    private addTile(position: Point) {
+    private addTile(position: Point3D) {
         const tile = new Tile(position)
 
-        this.container.addChild(tile.Graphics)
+        this.tileContainer.addChild(tile.Graphics)
     }
 
     /**
@@ -82,7 +81,7 @@ class Tilemap {
     private addWall(position: Point, direction: WallDirections) {
         const wall = new Wall(position, direction)
 
-        this.container.addChild(wall)
+        this.wallContainer.addChild(wall)
     }
 
     /**
@@ -108,7 +107,7 @@ class Tilemap {
      * @returns The first matching TileGraphics object or null if not found.
      */
     getTileByExactPosition(position: Point) {
-        return this.container.children.find((tile) => tile.position.equals(position))
+        return this.tileContainer.children.find((tile) => tile.position.equals(position))
     }
 
     /**
@@ -117,7 +116,7 @@ class Tilemap {
      * @returns The first matching TileGraphics object or null if not found.
      */
     getTileByPositionInBounds(position: Point) {
-        return this.container.children.find((tile) => this.isPointWithinTileBounds(position, tile))
+        return this.tileContainer.children.find((tile) => this.isPointWithinTileBounds(position, tile))
     }
 
     /**
@@ -141,8 +140,8 @@ class Tilemap {
      * Retrieves the container containing the tilemap.
      * @returns The Pixi.js container containing the tilemap.
      */
-    get Container(): Container {
-        return this.container
+    get TileContainer(): Container {
+        return this.tileContainer
     }
 }
 

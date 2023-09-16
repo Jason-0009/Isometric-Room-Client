@@ -1,17 +1,17 @@
-const path = require('path');
+const path = require('path')
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
     mode: 'development', // Set to 'production' for production builds
 
     devtool: 'source-map',
 
-    entry: './src/index.ts',
+    entry: './src/index.ts', // Adjust the entry point as needed
 
     output: {
         filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'dist'),
     },
 
     resolve: {
@@ -27,22 +27,18 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: [
-                    'style-loader', // Inject styles into the HTML during development
-                    'css-loader'   // Process CSS
-                ]
-            },
-        ],
+                use: ['style-loader', 'css-loader'],
+            }
+        ]
     },
 
     devServer: {
-        static: path.join(__dirname, 'dist'),
         port: 8080
     },
-    
+
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Isometric tilemap'
         })
     ]
-};
+}

@@ -65,10 +65,10 @@ export default class Wall extends Graphics {
         this.beginFill(WALL_COLORS.LEFT.SURFACE) // Gray color (you can change this)
 
         const points = [
-            0, TILE_DIMENSIONS.HEIGHT / 2,
+            0, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
             0, -WALL_DIMENSIONS.HEIGHT,
             TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2,
-            TILE_DIMENSIONS.WIDTH / 2, 0,
+            TILE_DIMENSIONS.WIDTH / 2, TILE_DIMENSIONS.THICKNESS,
         ]
 
         this.drawPolygon(points) // Set the dimensions
@@ -116,10 +116,10 @@ export default class Wall extends Graphics {
         this.beginFill(WALL_COLORS.RIGHT.SURFACE) // Gray color (you can change this)
 
         const points = [
-            TILE_DIMENSIONS.WIDTH / 2, 0,
+            TILE_DIMENSIONS.WIDTH / 2, TILE_DIMENSIONS.THICKNESS,
             TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2,
             TILE_DIMENSIONS.WIDTH, -WALL_DIMENSIONS.HEIGHT,
-            TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2
+            TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS
         ]
 
         this.drawPolygon(points) // Set the dimensions

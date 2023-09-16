@@ -1,7 +1,7 @@
 // Constants for wall dimensions
 export const WALL_DIMENSIONS = {
     HEIGHT: 100,
-    THICKNESS: 8,
+    THICKNESS: 5,
 }
 
 // Constants for wall colors

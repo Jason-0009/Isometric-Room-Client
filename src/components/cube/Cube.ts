@@ -6,7 +6,7 @@ import Tilemap from '../tile/Tilemap'
 
 import CubeContainer from './CubeContainer'
 
-import Camera from '../utils/Camera'
+import Camera from '../../utils/Camera'
 
 /**
  * Represents a cube object with interactivity and positioning.
@@ -117,7 +117,7 @@ export default class Cube {
     private getLocalPointerPosition(event: FederatedPointerEvent): Point {
         const pointerPosition = new Point(event.x, event.y)
 
-        return this.tilemap.Container.toLocal(pointerPosition)
+        return this.tilemap.TileContainer.toLocal(pointerPosition)
     }
 
     /**

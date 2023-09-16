@@ -4,7 +4,8 @@ import { TILE_COLORS, TILE_DIMENSIONS, TILE_GRID } from './Tile.constants'
 
 import TileHover from './TileHover'
 
-import { isometricToCartesian } from '../utils/coordinateConversions'
+import { isometricToCartesian } from '../../utils/coordinateTransformations'
+import Point3D from '../../utils/Point3D'
 
 /**
  * A class representing the graphical representation of a tile.
@@ -15,12 +16,14 @@ export default class TileGraphics extends Graphics {
 
     /**
      * Create a new TileGraphics instance.
-     * @param position - The position of the tile.
+     * @param _position - The position of the tile.
      */
-    constructor(position: Point) {
+    constructor(private _position: Point3D) {
         super()
 
-        this.position.copyFrom(position)
+        this._position = _position
+
+        this.position.set(_position.x, _position.y - _position.z)
 
         this.eventMode = 'static'
 
@@ -31,8 +34,6 @@ export default class TileGraphics extends Graphics {
      * Draw the tile and its borders.
      */
     private draw() {
-        this.lineStyle(1, TILE_COLORS.MARGIN) // Set margin color and thickness.
-
         this.drawSurface() // Draw the tile surface.
 
         // Check and draw borders based on tile position.
@@ -86,7 +87,7 @@ export default class TileGraphics extends Graphics {
             TILE_DIMENSIONS.WIDTH / 2, TILE_DIMENSIONS.HEIGHT + TILE_DIMENSIONS.THICKNESS,
             TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
         ]
-        
+
         this.beginFill(TILE_COLORS.RIGHT_BORDER) // Set border color.
 
         this.drawPolygon(points) // Draw the right border.
@@ -100,7 +101,7 @@ export default class TileGraphics extends Graphics {
     createHoverEffect() {
         if (this.tileHover) return
 
-        this.tileHover = new TileHover(this.position) // Create a hover effect.
+        this.tileHover = new TileHover(this._position) // Create a hover effect.
 
         this.parent.addChild(this.tileHover) // Add the hover effect to the parent container.
     }
@@ -123,11 +124,19 @@ export default class TileGraphics extends Graphics {
      * @returns {boolean} True if the tile below is empty, otherwise false.
      */
     private isBottomTileEmpty(): boolean {
-        // Convert isometric coordinates to cartesian coordinates.
-        const { x, y } = isometricToCartesian(this.position)
+        // // Convert isometric coordinates to cartesian coordinates.
+        // const { x, y } = isometricToCartesian(this._position)
 
-        // Check if there is a cell below and it's either "0" or undefined (empty).
-        return !TILE_GRID[x][y + 1]
+        // // Check if there is a cell below and it's either "0" or undefined (empty).
+        // return !TILE_GRID[x][y + 1]
+        // Convert isometric coordinates to cartesian coordinates.
+        const { x, y, z } = isometricToCartesian(this._position)
+
+        // Check if there is a row to the right.
+        const leftTileZ = TILE_GRID[x][y + 1]
+
+        // // Check if the tile to the right is either null or has a different `z` value.
+        return !leftTileZ || leftTileZ !== z
     }
 
     /**
@@ -136,9 +145,23 @@ export default class TileGraphics extends Graphics {
      */
     private isRightTileEmpty(): boolean {
         // Convert isometric coordinates to cartesian coordinates.
-        const { x, y } = isometricToCartesian(this.position)
+        const { x, y, z } = isometricToCartesian(this._position)
 
-        // Check if there is a cell to the right and it's either "0" or undefined (empty).
-        return !TILE_GRID[x + 1] || !TILE_GRID[x + 1][y]
+        // Check if there is a row to the right.
+        const nextRow = TILE_GRID[x + 1]
+
+        // There's no row to the right, so the tile is empty.
+        if (!nextRow) return true
+
+        // Get the `z` value of the tile to the right.
+        const rightTileZ = nextRow[y]
+
+        // Check if the tile to the right is either null or has a different `z` value.
+        return !rightTileZ || rightTileZ !== z
+    }
+
+
+    get Position() {
+        return this._position
     }
 }

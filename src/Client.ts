@@ -1,19 +1,26 @@
-import { Application, IApplicationOptions, Point } from 'pixi.js'
+import { Application, Container, IApplicationOptions, Point } from 'pixi.js'
 
-import Tilemap from './tile/Tilemap'
+import Tilemap from './components/tile/Tilemap'
 
-import CubeContainer from './cube/CubeContainer'
+import CubeContainer from './components/cube/CubeContainer'
 
-import Cube from './cube/Cube'
+import Cube from './components/cube/Cube'
 
-import { cartesianToIsometric } from './utils/coordinateConversions'
+import { cartesianToIsometric } from './utils/coordinateTransformations'
 
 import Camera from './utils/Camera'
+import Point3D from './utils/Point3D'
 
-class Client {
+/**
+ * Represents the client application for rendering an isometric scene.
+ */
+export default class Client {
   private application: Application
   private camera: Camera
+
+  private wallContainer: Container
   private tilemap: Tilemap
+
   private cubeContainer: CubeContainer
 
   constructor() {
@@ -21,7 +28,9 @@ class Client {
       width: window.innerWidth,
       height: window.innerHeight,
       backgroundColor: 0x000000,
-      antialias: true
+      antialias: true,
+      resolution: window.devicePixelRatio || 1,
+      autoDensity: true
     }
 
     this.application = new Application(OPTIONS)
@@ -30,9 +39,11 @@ class Client {
 
     document.body.appendChild(view)
 
-    // Create instances of Tilemap, CubeContainer, and other dependencies
     this.camera = new Camera(view, this.application.stage)
-    this.tilemap = new Tilemap()
+
+    this.wallContainer = new Container()
+    this.tilemap = new Tilemap(this.wallContainer)
+
     this.cubeContainer = new CubeContainer()
 
     this.initializeScene()
@@ -43,16 +54,21 @@ class Client {
     this.centerStage()
   }
 
+  /**
+   * Initializes the scene by adding containers and objects to the stage.
+   */
   private initializeScene() {
     const { stage } = this.application
 
-    stage.addChild(this.tilemap.Container)
+    stage.addChild(this.wallContainer)
+    stage.addChild(this.tilemap.TileContainer)
+
     stage.addChild(this.cubeContainer)
 
     this.createCubes([
-      { position: new Point(2, 0), size: 24 },
-      { position: new Point(0, 2), size: 32 },
-      { position: new Point(2, 2), size: 16 },
+      { position: new Point3D(0, 0, 0), size: 24 },
+      { position: new Point3D(0, 2, 0), size: 32 },
+      { position: new Point3D(0, 5, 0), size: 16 },
     ])
 
     this.cubeContainer.sortByTilePosition()
@@ -61,11 +77,14 @@ class Client {
     this.cubeContainer.position.set(0, 0)
   }
 
-  private createCubes(configurations: { position: Point; size: number }[]) {
+  /**
+   * Creates cubes based on specified configurations and adds them to the scene.
+   * @param configurations - An array of cube configurations including position and size.
+   */
+  private createCubes(configurations: { position: Point3D; size: number }[]) {
     configurations.forEach(({ position, size }) => {
       const isometricPosition = cartesianToIsometric(position)
 
-      // Pass the dependencies (Tilemap, CubeContainer, Camera, etc.) to the Cube constructor
       const cube = new Cube(
         isometricPosition,
         size,
@@ -78,11 +97,17 @@ class Client {
     })
   }
 
+  /**
+   * Sets up event listeners for window resize events.
+   */
   private setupEventListeners() {
     // Handle window resize events to adjust the stage
     window.addEventListener('resize', this.handleWindowResize.bind(this))
   }
 
+  /**
+   * Handles the window resize event, updating the renderer and centering the stage.
+   */
   private handleWindowResize() {
     const { innerWidth, innerHeight } = window
 
@@ -91,6 +116,9 @@ class Client {
     this.centerStage()
   }
 
+  /**
+   * Centers the stage within the viewport.
+   */
   private centerStage() {
     const { screen, stage } = this.application
 
@@ -101,5 +129,3 @@ class Client {
     stage.position.copyFrom(centerPosition)
   }
 }
-
-export default Client
