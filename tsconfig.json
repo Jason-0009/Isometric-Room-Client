@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "module": "CommonJS",
+        "outDir": "./dist",
+        "strict": true
+    }
+}

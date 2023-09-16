@@ -1,0 +1,5 @@
+export const CUBE_COLORS = {
+    TOP_FACE: 0xFF5733,
+    LEFT_FACE: 0x3399FF,
+    RIGHT_FACE: 0xFFD700,
+}
