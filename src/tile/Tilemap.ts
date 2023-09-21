@@ -9,8 +9,7 @@ import { cartesianToIsometric } from '../utils/coordinateTransformations'
 
 import Point3D from '../utils/Point3D'
 
-import { TILE_GRID } from './Tile.constants'
-import Cube from '../cube/Cube'
+import { TILE_GRID } from '../constants/Tile.constants'
 
 /**
  * Represents a tilemap containing a grid of tiles and walls.
@@ -45,7 +44,7 @@ export default class Tilemap {
                 if (wallDirection !== undefined) this.addWall(isometricPosition, wallDirection)
 
                 // Add a tile to the tilemap.
-                this.addTileToTilemap(isometricPosition)
+                this.addTile(isometricPosition)
             })
         })
     }
@@ -85,7 +84,7 @@ export default class Tilemap {
      * Adds a tile to the tilemap.
      * @param position - The position of the tile.
      */
-    private addTileToTilemap(position: Point3D) {
+    private addTile(position: Point3D) {
         const tile = new Tile(position)
 
         this.tiles.push(tile)

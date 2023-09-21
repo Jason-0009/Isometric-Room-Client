@@ -1,16 +1,18 @@
 import { Container, Point } from 'pixi.js'
 
+import { MAX_ZOOM, MIN_ZOOM } from '../constants/Camera.constants'
+
 /**
  * Camera class for handling panning and zooming of the stage.
  */
 export default class Camera {
-    // Flag to enable/disable camera controls
+    // Flag to enable/disable camera controls.
     private enabled: boolean = true
 
-    // Initial pointer position for panning
+    // Initial pointer position for panning.
     private initialDragPosition: Point | null = null
 
-    // Initial zoom factor
+    // Initial zoom factor.
     private zoomFactor: number = 0.1
 
     /**
@@ -83,10 +85,6 @@ export default class Camera {
 
         // Adjust the zoom factor based on wheel delta (positive for zoom in, negative for zoom out)
         this.zoomFactor -= event.deltaY * 0.001
-
-        // Define the minimum and maximum zoom levels
-        const MIN_ZOOM = 0.5
-        const MAX_ZOOM = 3
 
         // Clamp the zoom factor within the specified range
         this.zoomFactor = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, this.zoomFactor))

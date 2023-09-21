@@ -1,4 +1,4 @@
-import { TILE_DIMENSIONS } from '../tile/Tile.constants'
+import { TILE_DIMENSIONS } from '../constants/Tile.constants'
 
 import Point3D from './Point3D'
 

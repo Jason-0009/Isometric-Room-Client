@@ -2,9 +2,9 @@ import { Graphics, Point } from 'pixi.js'
 
 import WallDirection from './WallDirectionEnum'
 
-import { WALL_COLORS, WALL_DIMENSIONS } from './Wall.constants'
+import { WALL_COLORS, WALL_DIMENSIONS } from '../constants/Wall.constants'
 
-import { TILE_DIMENSIONS } from '../tile/Tile.constants'
+import { TILE_DIMENSIONS } from '../constants/Tile.constants'
 
 import Point3D from '../utils/Point3D'
 
@@ -66,7 +66,6 @@ export default class Wall extends Graphics {
      * Draw the left surface of the wall.
      */
     private drawLeftSurface() {
-        // Customize the wall appearance and dimensions as needed.
         this.beginFill(WALL_COLORS.LEFT.SURFACE)
 
         const points = [
@@ -76,13 +75,12 @@ export default class Wall extends Graphics {
             TILE_DIMENSIONS.WIDTH / 2, TILE_DIMENSIONS.THICKNESS,
         ]
 
-        this.drawPolygon(points) // Set the dimensions
+        this.drawPolygon(points)
 
         this.endFill()
     }
 
     private drawLeftBorder() {
-        // Customize the wall appearance and dimensions as needed.
         this.beginFill(WALL_COLORS.LEFT.BORDER)
 
         const points = [
@@ -99,7 +97,6 @@ export default class Wall extends Graphics {
     }
 
     private drawTopLeftBorder() {
-        // Customize the wall appearance and dimensions as needed.
         this.beginFill(WALL_COLORS.LEFT.BORDER_TOP)
 
         const points = [
@@ -109,7 +106,6 @@ export default class Wall extends Graphics {
             0, -WALL_DIMENSIONS.HEIGHT
         ]
 
-        // Set the dimensions.
         this.drawPolygon(points)
 
         this.endFill()
@@ -119,7 +115,6 @@ export default class Wall extends Graphics {
      * Draw the right surface of the wall.
      */
     private drawRightSurface() {
-        // Customize the wall appearance and dimensions as needed.
         this.beginFill(WALL_COLORS.RIGHT.SURFACE)
 
         const points = [
@@ -129,7 +124,7 @@ export default class Wall extends Graphics {
             TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS
         ]
 
-        this.drawPolygon(points) // Set the dimensions.
+        this.drawPolygon(points)
 
         this.endFill()
     }
@@ -138,7 +133,6 @@ export default class Wall extends Graphics {
      * Draw the right border of the wall.
      */
     private drawRightBorder() {
-        // Customize the wall appearance and dimensions as needed.
         this.beginFill(WALL_COLORS.RIGHT.BORDER)
 
         const points = [
@@ -148,7 +142,6 @@ export default class Wall extends Graphics {
             TILE_DIMENSIONS.WIDTH, -WALL_DIMENSIONS.HEIGHT
         ]
 
-        // Set the dimensions
         this.drawPolygon(points)
 
         this.endFill()
@@ -158,7 +151,6 @@ export default class Wall extends Graphics {
      * Draw the top-right border of the wall.
      */
     private drawTopRightBorder() {
-        // Customize the wall appearance and dimensions as needed.
         this.beginFill(WALL_COLORS.RIGHT.BORDER_TOP)
 
         const points = [
@@ -168,7 +160,6 @@ export default class Wall extends Graphics {
             TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2
         ]
 
-        // Set the dimensions.
         this.drawPolygon(points)
 
         this.endFill()

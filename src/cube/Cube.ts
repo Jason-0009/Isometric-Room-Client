@@ -6,9 +6,9 @@ import CubeCollection from './CubeCollection'
 import Tilemap from '../tile/Tilemap'
 import Tile from '../tile/Tile'
 
-import { TILE_DIMENSIONS } from '../tile/Tile.constants'
+import { TILE_DIMENSIONS } from '../constants/Tile.constants'
 
-import Camera from '../utils/Camera'
+import Camera from '../core/Camera'
 import Point3D from '../utils/Point3D'
 
 /**
@@ -20,8 +20,6 @@ export default class Cube {
     private graphics: CubeGraphics
 
     private isDragging = false
-
-    private previousTargetCube: Cube | null = null
 
     /**
      * Creates a new Cube instance.
@@ -154,22 +152,22 @@ export default class Cube {
     private placeOnTile(tile: Tile) {
         // Check if the target tile is the same as the current tile; if so, exit without making changes
         if (this.currentTile?.Position.equals(tile.Position)) return
-
+        
         // Find the tallest cube on the target tile, if any
         const cubeOnTargetTile = this.cubeCollection.findTallestCubeAt(tile.Position, this)
 
-        // Check if the current cube is bigger than the one on the target tile's stack
+        // Check if the current cube is bigger than the one on the target tile's stack; if so, exit without making changes
         if (cubeOnTargetTile && this.isLargerThan(cubeOnTargetTile)) return
-
+        
         // Calculate stacking offsets if there's a cube on the target tile's stack; otherwise, calculate tile offsets
-        const offsets = cubeOnTargetTile ?
-            this.calculateStackingOffsets(cubeOnTargetTile) :
-            this.calculateTileOffsets()
+        const offsets = cubeOnTargetTile
+            ? this.calculateStackingOffsets(cubeOnTargetTile)
+            : this.calculateTileOffsets()
 
         // Calculate the new position based on the offsets
-        const newPosition = cubeOnTargetTile ?
-            cubeOnTargetTile.Position.add(offsets) :
-            tile.Position.subtract(offsets)
+        const newPosition = cubeOnTargetTile
+            ? cubeOnTargetTile.Position.add(offsets)
+            : tile.Position.subtract(offsets)
 
         // Update the position
         this.setPosition(newPosition)

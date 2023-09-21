@@ -1,6 +1,6 @@
 import { Graphics } from 'pixi.js'
 
-import { CUBE_COLORS } from './Cube.constants'
+import { CUBE_COLORS } from '../constants/Cube.constants'
 
 import Point3D from '../utils/Point3D'
 

@@ -6,7 +6,7 @@ import { isometricToCartesian } from '../utils/coordinateTransformations'
 
 import Point3D from '../utils/Point3D'
 
-import { TILE_GRID, TILE_SURFACE_POINTS } from './Tile.constants'
+import { TILE_GRID, TILE_SURFACE_POINTS } from '../constants/Tile.constants'
 
 /**
  * Represents a tile on a grid.

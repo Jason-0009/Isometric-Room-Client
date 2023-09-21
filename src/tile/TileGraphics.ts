@@ -1,12 +1,10 @@
-import { Graphics, Point, Polygon } from 'pixi.js'
+import { Graphics } from 'pixi.js'
 
-import { TILE_COLORS, TILE_DIMENSIONS, TILE_GRID, TILE_SURFACE_POINTS } from './Tile.constants'
+import { TILE_COLORS, TILE_DIMENSIONS } from '../constants/Tile.constants'
 
 import TileHover from './TileHover'
 
 import Point3D from '../utils/Point3D'
-
-import { isometricToCartesian } from '../utils/coordinateTransformations'
 
 /**
  * A class representing the graphical representation of a tile.

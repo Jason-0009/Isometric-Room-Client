@@ -1,16 +1,16 @@
 import { Application, Container, IApplicationOptions, Point } from 'pixi.js'
 
-import Tilemap from './tile/Tilemap'
+import Tilemap from '../tile/Tilemap'
 
-import CubeCollection from './cube/CubeCollection'
+import CubeCollection from '../cube/CubeCollection'
 
-import Cube from './cube/Cube'
+import Cube from '../cube/Cube'
 
-import { cartesianToIsometric } from './utils/coordinateTransformations'
+import { cartesianToIsometric } from '../utils/coordinateTransformations'
 
-import Camera from './utils/Camera'
+import Camera from './Camera'
 
-import Point3D from './utils/Point3D'
+import Point3D from '../utils/Point3D'
 
 /**
  * Represents the client application for rendering an isometric scene.
@@ -40,10 +40,12 @@ export default class Client {
     // Create a Pixi.js application
     this.application = new Application(OPTIONS)
 
-    document.body.appendChild(this.application.view as HTMLCanvasElement)
+    const { view, stage } = this.application
+
+    document.body.appendChild(view as HTMLCanvasElement)
 
     // Initialize camera, wall container, tilemap, and cube collection
-    this.camera = new Camera(this.application.view as HTMLCanvasElement, this.application.stage)
+    this.camera = new Camera(view as HTMLCanvasElement, stage)
 
     this.wallContainer = new Container()
 

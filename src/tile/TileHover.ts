@@ -1,6 +1,6 @@
 import { Graphics, Point } from 'pixi.js'
 
-import { TILE_COLORS, TILE_SURFACE_POINTS } from './Tile.constants'
+import { TILE_COLORS, TILE_SURFACE_POINTS } from '../constants/Tile.constants'
 
 /**
  * Represents a graphical overlay for hovering over a tile.

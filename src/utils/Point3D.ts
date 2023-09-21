@@ -5,16 +5,16 @@ import { Point } from 'pixi.js'
  */
 export default class Point3D {
     /**
-     * Creates a new IsometricPoint instance with x, y, and z coordinates.
-     * @param {number} x - The x-coordinate.
-     * @param {number} y - The y-coordinate.
-     * @param {number} z - The z-coordinate.
+     * Creates a new Point3D instance with x, y, and z coordinates.
+     * @param {number} _x - The x-coordinate.
+     * @param {number} _y - The y-coordinate.
+     * @param {number} _z - The z-coordinate.
      */
     constructor(private _x: number, private _y: number, private _z: number) { }
 
     /**
-     * Copies the coordinates from another IsometricPoint.
-     * @param {Point3D} point - The other IsometricPoint to copy from.
+     * Copies the coordinates from another Point3D.
+     * @param {Point3D} point - The other Point3D to copy from.
      */
     copyFrom(point: Point3D): void {
         this._x = point._x
@@ -23,8 +23,8 @@ export default class Point3D {
     }
 
     /**
-     * Checks if this point is equal to another IsometricPoint.
-     * @param {Point3D} point - The other IsometricPoint to compare.
+     * Checks if this point is equal to another Point3D.
+     * @param {Point3D} point - The other Point3D to compare.
      * @returns {boolean} True if the points are equal, false otherwise.
      */
     equals(point: Point3D): boolean {
