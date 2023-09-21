@@ -1,14 +1,15 @@
 import { Application, Container, IApplicationOptions, Point } from 'pixi.js'
 
-import Tilemap from './components/tile/Tilemap'
+import Tilemap from './tile/Tilemap'
 
-import CubeContainer from './components/cube/CubeContainer'
+import CubeCollection from './cube/CubeCollection'
 
-import Cube from './components/cube/Cube'
+import Cube from './cube/Cube'
 
 import { cartesianToIsometric } from './utils/coordinateTransformations'
 
 import Camera from './utils/Camera'
+
 import Point3D from './utils/Point3D'
 
 /**
@@ -16,14 +17,17 @@ import Point3D from './utils/Point3D'
  */
 export default class Client {
   private application: Application
+
   private camera: Camera
 
   private wallContainer: Container
+
   private tilemap: Tilemap
 
-  private cubeContainer: CubeContainer
+  private cubeCollection: CubeCollection
 
   constructor() {
+    // Pixi.js application options
     const OPTIONS: Partial<IApplicationOptions> = {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -33,21 +37,24 @@ export default class Client {
       autoDensity: true
     }
 
+    // Create a Pixi.js application
     this.application = new Application(OPTIONS)
 
-    const view = this.application.view as HTMLCanvasElement
+    document.body.appendChild(this.application.view as HTMLCanvasElement)
 
-    document.body.appendChild(view)
-
-    this.camera = new Camera(view, this.application.stage)
+    // Initialize camera, wall container, tilemap, and cube collection
+    this.camera = new Camera(this.application.view as HTMLCanvasElement, this.application.stage)
 
     this.wallContainer = new Container()
+
     this.tilemap = new Tilemap(this.wallContainer)
 
-    this.cubeContainer = new CubeContainer()
+    this.cubeCollection = new CubeCollection()
 
+    // Initialize the scene
     this.initializeScene()
 
+    // Set up event listeners
     this.setupEventListeners()
 
     // Center the stage initially
@@ -60,21 +67,23 @@ export default class Client {
   private initializeScene() {
     const { stage } = this.application
 
-    stage.addChild(this.wallContainer)
-    stage.addChild(this.tilemap.TileContainer)
+    // Add containers and objects to the stage
+    stage.addChild(
+      this.wallContainer,
+      this.tilemap.TileContainer,
+      this.cubeCollection.CubeContainer
+    )
 
-    stage.addChild(this.cubeContainer)
-
+    // Create cubes with specified configurations
     this.createCubes([
-      { position: new Point3D(0, 0, 0), size: 24 },
-      { position: new Point3D(0, 2, 0), size: 32 },
-      { position: new Point3D(0, 5, 0), size: 16 },
+      { position: new Point3D(0, 0, 2), size: 24 },
+      { position: new Point3D(0, 5, 0), size: 32 },
+      { position: new Point3D(1, 5, 0), size: 32 },
+      { position: new Point3D(2, 5, 0), size: 16 },
     ])
 
-    this.cubeContainer.sortByTilePosition()
-
-    // Move the Viewport to an initial position if needed
-    this.cubeContainer.position.set(0, 0)
+    // Sort cubes by position
+    this.cubeCollection.sortCubesByPosition()
   }
 
   /**
@@ -88,12 +97,12 @@ export default class Client {
       const cube = new Cube(
         isometricPosition,
         size,
+        this.camera,
         this.tilemap,
-        this.cubeContainer,
-        this.camera
+        this.cubeCollection
       )
 
-      this.cubeContainer.addChild(cube.Graphics)
+      this.cubeCollection.addCube(cube)
     })
   }
 
@@ -112,7 +121,7 @@ export default class Client {
     const { innerWidth, innerHeight } = window
 
     this.application.renderer.resize(innerWidth, innerHeight)
-
+    
     this.centerStage()
   }
 

@@ -6,8 +6,10 @@ import { WALL_COLORS, WALL_DIMENSIONS } from './Wall.constants'
 
 import { TILE_DIMENSIONS } from '../tile/Tile.constants'
 
+import Point3D from '../utils/Point3D'
+
 export default class Wall extends Graphics {
-    constructor(position: Point, direction: WallDirection) {
+    constructor(position: Point3D, direction: WallDirection) {
         super()
 
         this.position.copyFrom(position)
@@ -24,14 +26,17 @@ export default class Wall extends Graphics {
                 // Draw both left and right walls
                 this.drawLeft()
                 this.drawRight()
+
                 break
 
             case WallDirection.LEFT:
                 this.drawLeft()
+
                 break
 
             case WallDirection.RIGHT:
                 this.drawRight()
+
                 break
 
             default:
@@ -62,7 +67,7 @@ export default class Wall extends Graphics {
      */
     private drawLeftSurface() {
         // Customize the wall appearance and dimensions as needed.
-        this.beginFill(WALL_COLORS.LEFT.SURFACE) // Gray color (you can change this)
+        this.beginFill(WALL_COLORS.LEFT.SURFACE)
 
         const points = [
             0, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
@@ -78,7 +83,7 @@ export default class Wall extends Graphics {
 
     private drawLeftBorder() {
         // Customize the wall appearance and dimensions as needed.
-        this.beginFill(WALL_COLORS.LEFT.BORDER) // Gray color (you can change this)
+        this.beginFill(WALL_COLORS.LEFT.BORDER)
 
         const points = [
             0, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
@@ -87,7 +92,8 @@ export default class Wall extends Graphics {
             0, -WALL_DIMENSIONS.HEIGHT
         ]
 
-        this.drawPolygon(points) // Set the dimensions
+        // Set the dimensions.
+        this.drawPolygon(points)
 
         this.endFill()
     }
@@ -103,7 +109,8 @@ export default class Wall extends Graphics {
             0, -WALL_DIMENSIONS.HEIGHT
         ]
 
-        this.drawPolygon(points) // Set the dimensions
+        // Set the dimensions.
+        this.drawPolygon(points)
 
         this.endFill()
     }
@@ -113,7 +120,7 @@ export default class Wall extends Graphics {
      */
     private drawRightSurface() {
         // Customize the wall appearance and dimensions as needed.
-        this.beginFill(WALL_COLORS.RIGHT.SURFACE) // Gray color (you can change this)
+        this.beginFill(WALL_COLORS.RIGHT.SURFACE)
 
         const points = [
             TILE_DIMENSIONS.WIDTH / 2, TILE_DIMENSIONS.THICKNESS,
@@ -122,7 +129,7 @@ export default class Wall extends Graphics {
             TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS
         ]
 
-        this.drawPolygon(points) // Set the dimensions
+        this.drawPolygon(points) // Set the dimensions.
 
         this.endFill()
     }
@@ -132,7 +139,7 @@ export default class Wall extends Graphics {
      */
     private drawRightBorder() {
         // Customize the wall appearance and dimensions as needed.
-        this.beginFill(WALL_COLORS.RIGHT.BORDER) // Gray color (you can change this)
+        this.beginFill(WALL_COLORS.RIGHT.BORDER)
 
         const points = [
             TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
@@ -141,7 +148,8 @@ export default class Wall extends Graphics {
             TILE_DIMENSIONS.WIDTH, -WALL_DIMENSIONS.HEIGHT
         ]
 
-        this.drawPolygon(points) // Set the dimensions
+        // Set the dimensions
+        this.drawPolygon(points)
 
         this.endFill()
     }
@@ -160,7 +168,8 @@ export default class Wall extends Graphics {
             TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2
         ]
 
-        this.drawPolygon(points) // Set the dimensions
+        // Set the dimensions.
+        this.drawPolygon(points)
 
         this.endFill()
     }

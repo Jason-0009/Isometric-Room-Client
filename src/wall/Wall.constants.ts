@@ -17,5 +17,3 @@ export const WALL_COLORS = {
         BORDER_TOP: 0x0288D1, // Light Blue
     },
 }
-
-

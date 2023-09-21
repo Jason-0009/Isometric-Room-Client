@@ -1,4 +1,4 @@
-import { TILE_DIMENSIONS } from '../components/tile/Tile.constants'
+import { TILE_DIMENSIONS } from '../tile/Tile.constants'
 
 import Point3D from './Point3D'
 
@@ -14,7 +14,6 @@ export const cartesianToIsometric = (position: Point3D) => {
     
     return new Point3D(x, y, z)
 }
-
 
 /**
  * Converts isometric coordinates (x, y, z) to cartesian coordinates (x, y, z).
