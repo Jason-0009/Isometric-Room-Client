@@ -78,6 +78,12 @@ export default class Point3D {
         )
 
     /**
+     * Returns a string representation of the Point3D.
+     * @returns {string} A string representation of the Point3D.
+     */
+    toString = (): string => `Point3D(${this.#x}, ${this.#y}, ${this.#z})`
+
+    /**
      * Gets the x-coordinate of the point.
      * @returns {number} The x-coordinate.
      */

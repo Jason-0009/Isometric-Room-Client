@@ -14,8 +14,8 @@ import { AVATAR_WIDTH } from '../../constants/Avatar.constants'
 export default class Avatar {
     /**
      * The position of the avatar.
-     * @private
      * @type {Point3D}
+     * @private
      */
     readonly #position: Point3D;
 

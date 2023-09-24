@@ -101,3 +101,14 @@ export const TILE_SURFACE_POINTS: number[] = [
     TILE_DIMENSIONS.WIDTH / 2, TILE_DIMENSIONS.HEIGHT,
     0, TILE_DIMENSIONS.HEIGHT / 2,
 ]
+
+/**
+ * Grid configuration representing whether to add a tile at each grid cell.
+ * Each cell can have a height value (number) or be empty (null).
+ * @type {(number | null)[][]}
+ */
+export const TILEMAP_GRID: number[][] = [
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0]
+]

@@ -1,9 +1,9 @@
-import Point3D from './Point3D'
+import Point3D from '../utils/Point3D'
 
 /**
  * Represents a node in a pathfinding algorithm.
  */
-class Node {
+export default class Node {
     /**
      * The position of the node in 3D space.
      * @type {Point3D}
@@ -16,36 +16,51 @@ class Node {
      * @type {number}
      * @private
      */
-    #gCost: number = 0
+    #gCost: number
 
     /**
      * Heuristic (estimated) cost from this node to the goal node (h).
      * @type {number}
      * @private
      */
-    #hCost: number = 0
+    #hCost: number
 
     /**
      * Total cost of the node, which is the sum of gCost and hCost (fCost).
      * @type {number}
      * @private
      */
-    #fCost: number = 0
+    #fCost: number
 
     /**
      * Parent node for tracing the path.
      * @type {Node | null}
      * @private
      */
-    #parent: Node | null = null
+    #parent: Node | null
 
     /**
      * Creates a new Node instance.
      * @param {Point3D} position - The position of the node in 3D space.
+     * @param {number} gCost - The cost from the start node to this node (gCost).
+     * @param {number} hCost - The heuristic (estimated) cost from this node to the goal node (hCost).
      */
-    constructor(position: Point3D) {
+    constructor(position: Point3D, gCost: number, hCost: number, parent: Node | null = null) {
         this.#position = position
+
+        this.#gCost = gCost
+        this.#hCost = hCost
+        this.#fCost = gCost + hCost
+
+        this.#parent = parent
     }
+
+    /**
+     * Get a string representation of the Node.
+     * @returns {string} - A string representation of the Node.
+     */
+    toString = (): string =>
+        `Node(position: ${this.#position}, gCost: ${this.#gCost}, hCost: ${this.#hCost}, fCost: ${this.#fCost}`
 
     /**
      * Get the position of the node.
@@ -124,5 +139,3 @@ class Node {
         this.#parent = value
     }
 }
-
-export default Node

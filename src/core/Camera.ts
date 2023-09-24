@@ -8,36 +8,36 @@ import { MAX_ZOOM, MIN_ZOOM } from '../constants/Camera.constants'
 export default class Camera {
     /**
      * HTMLCanvasElement to attach camera controls to.
-     * @private
      * @type {HTMLCanvasElement}
+     * @private
      */
     readonly #view: HTMLCanvasElement
 
     /**
      * Application stage to apply camera controls on.
-     * @private
      * @type {Container}
+     * @private
      */
     readonly #stage: Container
 
     /**
      * Flag to enable/disable camera controls.
-     * @private
      * @type {boolean}
+     * @private
      */
     #enabled: boolean = true
 
     /**
      * Initial pointer position for panning.
-     * @private
      * @type {Point | null}
+     * @private
      */
     #initialDragPosition: Point | null = null
 
     /**
      * Initial zoom factor.
-     * @private
      * @type {number}
+     * @private
      */
     #zoomFactor: number = 0.1
 

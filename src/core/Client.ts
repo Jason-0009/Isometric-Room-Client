@@ -18,43 +18,43 @@ import Point3D from '../utils/Point3D'
 export default class Client {
   /**
    * Application instance.
-   * @private
    * @type {Application}
+   * @private
    */
   readonly #application: Application
 
   /**
    * Camera for handling panning and zooming.
-   * @private
    * @type {Camera}
+   * @private
    */
   readonly #camera: Camera
 
   /**
    * Container for walls in the scene.
-   * @private
    * @type {Container}
+   * @private
    */
   readonly #wallContainer: Container
 
   /**
    * Tilemap for handling tiles in the scene.
-   * @private
    * @type {Tilemap}
+   * @private
    */
   readonly #tilemap: Tilemap
 
   /**
    * Collection of cubes in the scene.
-   *
    * @type {CubeCollection}
+   * @private
    */
   readonly #cubeCollection: CubeCollection
 
   /**
    * Avatar object in the scene.
-   * @private
    * @type {Avatar}
+   * @private
    */
   readonly #avatar: Avatar
 

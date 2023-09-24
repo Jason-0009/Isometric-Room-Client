@@ -6,7 +6,7 @@ import TileGraphics from './TileGraphics'
 
 import { isometricToCartesian } from '../../utils/coordinateTransformations'
 
-import { TILEMAP_GRID } from '../../constants/Tilemap.constants'
+import { TILEMAP_GRID } from '../../constants/Tile.constants'
 
 import { TILE_SURFACE_POINTS } from '../../constants/Tile.constants'
 
@@ -16,21 +16,20 @@ import { TILE_SURFACE_POINTS } from '../../constants/Tile.constants'
 export default class Tile {
     /**
      * The position of the tile in isometric space.
-     * @private
      * @type {Point3D}
+     * @private
      */
     readonly #position: Point3D
 
     /**
      * The graphics representing the tile.
-     * @private
      * @type {TileGraphics}
+     * @private
      */
     readonly #graphics: TileGraphics
 
     /**
      * Creates a new Tile instance.
-     * @private
      * @param {Point3D} position - The position of the tile in isometric space.
      */
     constructor(position: Point3D) {

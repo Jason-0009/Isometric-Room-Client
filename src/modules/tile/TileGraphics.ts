@@ -12,8 +12,8 @@ import { TILE_COLORS, TILE_DIMENSIONS } from '../../constants/Tile.constants'
 export default class TileGraphics extends Graphics {
     /**
      * Stores the hover effect for the tile.
-     * @private
      * @type {TileHover | null}
+     * @private
      */
     #tileHover: TileHover | null = null;
 

@@ -8,7 +8,7 @@ import WallDirection from '../wall/WallDirection'
 import { cartesianToIsometric } from '../../utils/coordinateTransformations'
 import Point3D from '../../utils/Point3D'
 
-import { TILEMAP_GRID } from '../../constants/Tilemap.constants'
+import { TILEMAP_GRID } from '../../constants/Tile.constants'
 
 /**
  * Represents a tilemap containing a grid of tiles and walls.
@@ -16,22 +16,22 @@ import { TILEMAP_GRID } from '../../constants/Tilemap.constants'
 export default class Tilemap {
     /**
      * The container for walls in the tilemap.
-     * @private
      * @type {Container}
+     * @private
      */
     #wallContainer: Container
 
     /**
      * Array of tiles in the tilemap.
-     * @private
      * @type {Tile[]}
+     * @private
      */
     #tiles: Tile[]
-
+    
     /**
      * The container for tiles in the tilemap.
-     * @private
      * @type {Container}
+     * @private
      */
     #tileContainer: Container
 
@@ -40,25 +40,9 @@ export default class Tilemap {
      * @param {Container} wallContainer - The container for walls in the tilemap.
      */
     constructor(wallContainer: Container) {
-        /**
-         * The container for walls in the tilemap.
-         * @private
-         * @type {Container}
-         */
         this.#wallContainer = wallContainer
 
-        /**
-         * Array of tiles in the tilemap.
-         * @private
-         * @type {Tile[]}
-         */
         this.#tiles = []
-
-        /**
-         * The container for tiles in the tilemap.
-         * @private
-         * @type {Container}
-         */
         this.#tileContainer = new Container()
 
         this.generateTilemap()
@@ -70,7 +54,7 @@ export default class Tilemap {
     generateTilemap(): void {
         TILEMAP_GRID.forEach((row, rowIndex) => {
             row.forEach((height, columnIndex) => {
-                if (height === null) return
+                if (height === -1) return
 
                 const position = new Point3D(rowIndex, columnIndex, height)
 
