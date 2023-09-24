@@ -1,54 +1,94 @@
 /**
- * Constants for tile dimensions.
+ * Represents dimensions for a tile.
  */
-export const TILE_DIMENSIONS = {
+type TileDimensions = {
     /**
      * The width of a tile.
-     * @type {number}
+     */
+    WIDTH: number
+
+    /**
+     * The height of a tile.
+     */
+    HEIGHT: number
+
+    /**
+     * The thickness of a tile.
+     */
+    THICKNESS: number
+}
+
+/**
+ * Represents colors for a tile.
+ */
+type TileColors = {
+    /**
+     * The color of the tile's surface.
+     */
+    SURFACE: number
+
+    /**
+     * The color of the left border of the tile.
+     */
+    LEFT_BORDER: number
+
+    /**
+     * The color of the right border of the tile.
+     */
+    RIGHT_BORDER: number
+
+    /**
+     * The color of the tile when hovered over.
+     */
+    HOVER: number
+}
+
+/**
+ * Constants for tile dimensions.
+ * @type {TileDimensions}
+ */
+export const TILE_DIMENSIONS: TileDimensions = {
+    /**
+     * The width of a tile.
      */
     WIDTH: 64,
 
     /**
      * The height of a tile.
-     * @type {number}
      */
     HEIGHT: 32,
 
     /**
      * The thickness of a tile.
-     * @type {number}
      */
     THICKNESS: 5,
-};
+}
 
 /**
  * Constants for tile colors.
+ * @type {TileColors}
  */
-export const TILE_COLORS = {
+export const TILE_COLORS: TileColors = {
     /**
      * The color of the tile's surface.
-     * @type {number}
      */
     SURFACE: 0xFF0000,
 
     /**
      * The color of the left border of the tile.
-     * @type {number}
      */
     LEFT_BORDER: 0xDC143C,
 
     /**
      * The color of the right border of the tile.
-     * @type {number}
      */
     RIGHT_BORDER: 0xCC0000,
 
     /**
      * The color of the tile when hovered over.
-     * @type {number}
      */
     HOVER: 0xE60000,
-};
+}
 
 /**
  * Points defining the shape of a tile's surface (used for drawing).
@@ -60,15 +100,4 @@ export const TILE_SURFACE_POINTS: number[] = [
     TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2,
     TILE_DIMENSIONS.WIDTH / 2, TILE_DIMENSIONS.HEIGHT,
     0, TILE_DIMENSIONS.HEIGHT / 2,
-];
-
-/**
- * Grid configuration representing whether to add a tile at each grid cell.
- * Each cell can have a height value (number) or be empty (null).
- * @type {(number | null)[][]}
- */
-export const TILE_GRID: (number | null)[][] = [
-    [2, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0]
-];
+]

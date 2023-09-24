@@ -1,7 +1,8 @@
 /**
  * Enumerates the possible directions for a wall.
+ * @enum {number}
  */
-enum WallDirections {
+enum WallDirection {
   /**
    * Represents a wall that exists on both sides.
    */
@@ -18,4 +19,4 @@ enum WallDirections {
   RIGHT,
 }
 
-export default WallDirections
+export default WallDirection

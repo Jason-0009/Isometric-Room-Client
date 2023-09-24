@@ -1,59 +1,79 @@
 /**
- * Constants for wall dimensions.
+ * Represents dimensions for a wall.
  */
-export const WALL_DIMENSIONS = {
+type WallDimensions = {
     /**
      * The height of the wall in units.
      */
-    HEIGHT: 100,
+    HEIGHT: number
 
     /**
      * The thickness of the wall in units.
      */
-    THICKNESS: 5,
-};
+    THICKNESS: number
+}
 
 /**
- * Constants for wall colors.
+ * Represents colors for a wall.
  */
-export const WALL_COLORS = {
-    /**
-     * Colors for the left wall.
-     */
+type WallColors = {
     LEFT: {
         /**
          * The surface color of the left wall.
          */
-        SURFACE: 0xFFC107, // Amber
+        SURFACE: number
 
         /**
          * The border color of the left wall.
          */
-        BORDER: 0xFF5722, // Deep Orange
+        BORDER: number
 
         /**
          * The top border color of the left wall.
          */
-        BORDER_TOP: 0x7B1FA2, // Purple
-    },
+        BORDER_TOP: number
+    }
 
-    /**
-     * Colors for the right wall.
-     */
     RIGHT: {
         /**
          * The surface color of the right wall.
          */
-        SURFACE: 0x4CAF50, // Green
+        SURFACE: number
 
         /**
          * The border color of the right wall.
          */
-        BORDER: 0x009688, // Teal
+        BORDER: number
 
         /**
          * The top border color of the right wall.
          */
+        BORDER_TOP: number
+    }
+}
+
+/**
+ * Constants for wall dimensions.
+ * @type {WallDimensions}
+ */
+export const WALL_DIMENSIONS: WallDimensions = {
+    HEIGHT: 100,
+    THICKNESS: 5,
+}
+
+/**
+ * Constants for wall colors.
+ * @type {WallColors}
+ */
+export const WALL_COLORS: WallColors = {
+    LEFT: {
+        SURFACE: 0xFFC107, // Amber
+        BORDER: 0xFF5722, // Deep Orange
+        BORDER_TOP: 0x7B1FA2, // Purple
+    },
+    RIGHT: {
+        SURFACE: 0x4CAF50, // Green
+        BORDER: 0x009688, // Teal
         BORDER_TOP: 0x0288D1, // Light Blue
     },
-};
+}

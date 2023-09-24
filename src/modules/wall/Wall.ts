@@ -1,71 +1,80 @@
-import { Graphics, Point } from 'pixi.js'
+import { Graphics } from 'pixi.js'
 
-import WallDirection from './WallDirectionEnum'
+import Point3D from '../../utils/Point3D'
 
-import { WALL_COLORS, WALL_DIMENSIONS } from '../constants/Wall.constants'
+import WallDirection from './WallDirection'
 
-import { TILE_DIMENSIONS } from '../constants/Tile.constants'
+import { WALL_COLORS, WALL_DIMENSIONS } from '../../constants/Wall.constants'
 
-import Point3D from '../utils/Point3D'
+import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
 
+/**
+ * Represents a graphical representation of a wall.
+ */
 export default class Wall extends Graphics {
+    /**
+     * Create a new Wall instance.
+     * @param {Point3D} position - The position of the wall.
+     * @param {WallDirection} direction - The direction of the wall.
+     */
     constructor(position: Point3D, direction: WallDirection) {
         super()
 
         this.position.copyFrom(position)
 
-        this.draw(direction)
+        this.#draw(direction)
     }
 
     /**
      * Draw the wall graphics.
+     * @param {WallDirection} direction - The direction of the wall.
      */
-    private draw(direction: WallDirection) {
+    #draw(direction: WallDirection): void {
         switch (direction) {
             case WallDirection.BOTH:
                 // Draw both left and right walls
-                this.drawLeft()
-                this.drawRight()
-
+                this.#drawLeft()
+                this.#drawRight()
                 break
 
             case WallDirection.LEFT:
-                this.drawLeft()
-
+                this.#drawLeft()
                 break
 
             case WallDirection.RIGHT:
-                this.drawRight()
-
+                this.#drawRight()
                 break
 
             default:
-                console.error('Invalid direction: ', direction)
+                console.error(`Invalid direction: ${direction}`)
         }
     }
 
     /**
      * Draw the left side of the wall.
+     * @private
      */
-    private drawLeft() {
-        this.drawLeftSurface()
-        this.drawLeftBorder()
-        this.drawTopLeftBorder()
+    #drawLeft(): void {
+        this.#drawLeftSurface()
+        this.#drawLeftBorder()
+        this.#drawTopLeftBorder()
     }
 
     /**
      * Draw the right side of the wall.
+     * @private
      */
-    private drawRight() {
-        this.drawRightSurface()
-        this.drawRightBorder()
-        this.drawTopRightBorder()
+    #drawRight(): void {
+        this.#drawRightSurface()
+        this.#drawRightBorder()
+        this.#drawTopRightBorder()
     }
 
     /**
      * Draw the left surface of the wall.
+     * @private
      */
-    private drawLeftSurface() {
+    #drawLeftSurface(): void {
         this.beginFill(WALL_COLORS.LEFT.SURFACE)
 
         const points = [
@@ -80,30 +89,37 @@ export default class Wall extends Graphics {
         this.endFill()
     }
 
-    private drawLeftBorder() {
+    /**
+     * Draw the left border of the wall.
+     * @private
+     */
+    #drawLeftBorder(): void {
         this.beginFill(WALL_COLORS.LEFT.BORDER)
 
         const points = [
             0, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
             -WALL_DIMENSIONS.THICKNESS, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS - WALL_DIMENSIONS.THICKNESS / 2,
             -WALL_DIMENSIONS.THICKNESS, -WALL_DIMENSIONS.HEIGHT - WALL_DIMENSIONS.THICKNESS / 2,
-            0, -WALL_DIMENSIONS.HEIGHT
+            0, -WALL_DIMENSIONS.HEIGHT,
         ]
 
-        // Set the dimensions.
         this.drawPolygon(points)
 
         this.endFill()
     }
 
-    private drawTopLeftBorder() {
+    /**
+     * Draw the top-left border of the wall.
+     * @private
+     */
+    #drawTopLeftBorder(): void {
         this.beginFill(WALL_COLORS.LEFT.BORDER_TOP)
 
         const points = [
             -WALL_DIMENSIONS.THICKNESS, -WALL_DIMENSIONS.HEIGHT - WALL_DIMENSIONS.THICKNESS / 2,
             TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2 - WALL_DIMENSIONS.THICKNESS,
             TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2,
-            0, -WALL_DIMENSIONS.HEIGHT
+            0, -WALL_DIMENSIONS.HEIGHT,
         ]
 
         this.drawPolygon(points)
@@ -113,15 +129,16 @@ export default class Wall extends Graphics {
 
     /**
      * Draw the right surface of the wall.
+     * @private
      */
-    private drawRightSurface() {
+    #drawRightSurface(): void {
         this.beginFill(WALL_COLORS.RIGHT.SURFACE)
 
         const points = [
             TILE_DIMENSIONS.WIDTH / 2, TILE_DIMENSIONS.THICKNESS,
             TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2,
             TILE_DIMENSIONS.WIDTH, -WALL_DIMENSIONS.HEIGHT,
-            TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS
+            TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
         ]
 
         this.drawPolygon(points)
@@ -131,15 +148,16 @@ export default class Wall extends Graphics {
 
     /**
      * Draw the right border of the wall.
+     * @private
      */
-    private drawRightBorder() {
+    #drawRightBorder(): void {
         this.beginFill(WALL_COLORS.RIGHT.BORDER)
 
         const points = [
             TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
             TILE_DIMENSIONS.WIDTH + WALL_DIMENSIONS.THICKNESS, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS - WALL_DIMENSIONS.THICKNESS / 2,
             TILE_DIMENSIONS.WIDTH + WALL_DIMENSIONS.THICKNESS, -WALL_DIMENSIONS.HEIGHT - WALL_DIMENSIONS.THICKNESS / 2,
-            TILE_DIMENSIONS.WIDTH, -WALL_DIMENSIONS.HEIGHT
+            TILE_DIMENSIONS.WIDTH, -WALL_DIMENSIONS.HEIGHT,
         ]
 
         this.drawPolygon(points)
@@ -149,15 +167,16 @@ export default class Wall extends Graphics {
 
     /**
      * Draw the top-right border of the wall.
+     * @private
      */
-    private drawTopRightBorder() {
+    #drawTopRightBorder(): void {
         this.beginFill(WALL_COLORS.RIGHT.BORDER_TOP)
 
         const points = [
             TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2 - WALL_DIMENSIONS.THICKNESS,
             TILE_DIMENSIONS.WIDTH + WALL_DIMENSIONS.THICKNESS, -WALL_DIMENSIONS.HEIGHT - WALL_DIMENSIONS.THICKNESS / 2,
             TILE_DIMENSIONS.WIDTH, -WALL_DIMENSIONS.HEIGHT,
-            TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2
+            TILE_DIMENSIONS.WIDTH / 2, -WALL_DIMENSIONS.HEIGHT - TILE_DIMENSIONS.HEIGHT / 2,
         ]
 
         this.drawPolygon(points)

@@ -1,33 +1,67 @@
 import { Application, Container, IApplicationOptions, Point } from 'pixi.js'
 
-import Tilemap from '../tile/Tilemap'
-
-import CubeCollection from '../cube/CubeCollection'
-
-import Cube from '../cube/Cube'
-
-import { cartesianToIsometric } from '../utils/coordinateTransformations'
-
 import Camera from './Camera'
 
+import Avatar from '../modules/avatar/Avatar'
+
+import Tilemap from '../modules/tile/Tilemap'
+
+import CubeCollection from '../modules/cube/CubeCollection'
+import Cube from '../modules/cube/Cube'
+
+import { cartesianToIsometric } from '../utils/coordinateTransformations'
 import Point3D from '../utils/Point3D'
 
 /**
  * Represents the client application for rendering an isometric scene.
  */
 export default class Client {
-  private application: Application
+  /**
+   * Application instance.
+   * @private
+   * @type {Application}
+   */
+  readonly #application: Application
 
-  private camera: Camera
+  /**
+   * Camera for handling panning and zooming.
+   * @private
+   * @type {Camera}
+   */
+  readonly #camera: Camera
 
-  private wallContainer: Container
+  /**
+   * Container for walls in the scene.
+   * @private
+   * @type {Container}
+   */
+  readonly #wallContainer: Container
 
-  private tilemap: Tilemap
+  /**
+   * Tilemap for handling tiles in the scene.
+   * @private
+   * @type {Tilemap}
+   */
+  readonly #tilemap: Tilemap
 
-  private cubeCollection: CubeCollection
+  /**
+   * Collection of cubes in the scene.
+   *
+   * @type {CubeCollection}
+   */
+  readonly #cubeCollection: CubeCollection
 
+  /**
+   * Avatar object in the scene.
+   * @private
+   * @type {Avatar}
+   */
+  readonly #avatar: Avatar
+
+  /**
+   * Create a new Client instance.
+   */
   constructor() {
-    // Pixi.js application options
     const OPTIONS: Partial<IApplicationOptions> = {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -37,101 +71,104 @@ export default class Client {
       autoDensity: true
     }
 
-    // Create a Pixi.js application
-    this.application = new Application(OPTIONS)
+    this.#application = new Application(OPTIONS)
 
-    const { view, stage } = this.application
+    const { view, stage } = this.#application
 
     document.body.appendChild(view as HTMLCanvasElement)
 
-    // Initialize camera, wall container, tilemap, and cube collection
-    this.camera = new Camera(view as HTMLCanvasElement, stage)
+    this.#camera = new Camera(view as HTMLCanvasElement, stage)
 
-    this.wallContainer = new Container()
+    this.#wallContainer = new Container()
+    this.#tilemap = new Tilemap(this.#wallContainer)
 
-    this.tilemap = new Tilemap(this.wallContainer)
+    this.#cubeCollection = new CubeCollection()
 
-    this.cubeCollection = new CubeCollection()
+    const initialAvatarPosition = cartesianToIsometric(new Point3D(1, 0, 0))
+
+    this.#avatar = new Avatar(initialAvatarPosition)
 
     // Initialize the scene
-    this.initializeScene()
+    this.#initializeScene()
 
     // Set up event listeners
-    this.setupEventListeners()
+    this.#setupEventListeners()
 
     // Center the stage initially
-    this.centerStage()
+    this.#centerStage()
   }
 
   /**
    * Initializes the scene by adding containers and objects to the stage.
    */
-  private initializeScene() {
-    const { stage } = this.application
+  #initializeScene(): void {
+    const { stage } = this.#application
 
     // Add containers and objects to the stage
     stage.addChild(
-      this.wallContainer,
-      this.tilemap.TileContainer,
-      this.cubeCollection.CubeContainer
+      this.#wallContainer,
+      this.#tilemap.tileContainer,
+      this.#cubeCollection.cubeContainer,
+      this.#avatar.graphics
     )
 
-    // Create cubes with specified configurations
-    this.createCubes([
-      { position: new Point3D(0, 0, 2), size: 24 },
-      { position: new Point3D(0, 5, 0), size: 32 },
-      { position: new Point3D(1, 5, 0), size: 32 },
-      { position: new Point3D(2, 5, 0), size: 16 },
+    // Create cubes based on specified configurations
+    this.#createCubes([
+      { size: 24, position: new Point3D(0, 0, 0) },
+      { size: 32, position: new Point3D(0, 5, 0) },
+      { size: 32, position: new Point3D(1, 5, 0) },
+      { size: 16, position: new Point3D(2, 5, 0) },
     ])
 
     // Sort cubes by position
-    this.cubeCollection.sortCubesByPosition()
+    this.#cubeCollection.sortCubesByPosition()
   }
 
   /**
    * Creates cubes based on specified configurations and adds them to the scene.
-   * @param configurations - An array of cube configurations including position and size.
+   *
+   * @param {Array<{ position: Point3D, size: number }>} configurations - An array of cube configurations including position and size.
    */
-  private createCubes(configurations: { position: Point3D; size: number }[]) {
-    configurations.forEach(({ position, size }) => {
+  #createCubes(configurations: { size: number, position: Point3D }[]): void {
+    configurations.forEach(({ size, position }) => {
       const isometricPosition = cartesianToIsometric(position)
 
       const cube = new Cube(
-        isometricPosition,
         size,
-        this.camera,
-        this.tilemap,
-        this.cubeCollection
+        isometricPosition,
+        this.#camera,
+        this.#tilemap,
+        this.#cubeCollection
       )
 
-      this.cubeCollection.addCube(cube)
+      this.#cubeCollection.addCube(cube)
     })
   }
 
   /**
    * Sets up event listeners for window resize events.
    */
-  private setupEventListeners() {
+  #setupEventListeners(): void {
     // Handle window resize events to adjust the stage
-    window.addEventListener('resize', this.handleWindowResize.bind(this))
+    window.addEventListener('resize', this.#handleWindowResize.bind(this))
   }
 
   /**
    * Handles the window resize event, updating the renderer and centering the stage.
    */
-  private handleWindowResize() {
+  #handleWindowResize(): void {
     const { innerWidth, innerHeight } = window
 
-    this.application.renderer.resize(innerWidth, innerHeight)
-    
-    this.centerStage()
+    this.#application.renderer.resize(innerWidth, innerHeight)
+
+    this.#centerStage()
   }
 
   /**
    * Centers the stage within the viewport.
    */
-  private centerStage() {
-    const { screen, stage } = this.application
+  #centerStage(): void {
+    const { screen, stage } = this.#application
 
     // Calculate the center of the screen
     const centerPosition = new Point(screen.width / 2, screen.height / 2)
