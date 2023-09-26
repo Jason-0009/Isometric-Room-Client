@@ -3,6 +3,13 @@ import { Container } from 'pixi.js'
 import Cube from './Cube'
 
 import Point3D from '../../utils/Point3D'
+import Camera from '../../core/Camera'
+
+import Tilemap from '../tile/Tilemap'
+
+import { CUBE_SETTINGS } from '../../constants/Cube.constants'
+import { calculateCubeOffsets } from '../../utils/offsetCalculations'
+import { cartesianToIsometric } from '../../utils/coordinateTransformations'
 
 /**
  * A collection of cubes that can be managed and sorted.
@@ -10,15 +17,15 @@ import Point3D from '../../utils/Point3D'
 export default class CubeCollection {
     /**
      * An array holding all the cube objects in the collection.
-     * @private
      * @type {Cube[]}
+     * @private
      */
     readonly #cubes: Cube[]
 
     /**
      * The container used to display the cubes in the collection.
-     * @private
      * @type {Container}
+     * @private
      */
     readonly #cubeContainer: Container
 
@@ -32,14 +39,31 @@ export default class CubeCollection {
     }
 
     /**
-     * Adds a cube to the collection and the cube container.
-     * @param {Cube} cube - The cube to add.
+     * Initializes the CubeCollection with cubes based on predefined settings.
+     * @param {Camera} camera - The camera object for controlling the view.
+     * @param {Tilemap} tilemap - The tilemap where the cubes exist.
+     * @param {CubeCollection} cubeCollection - The repository managing cubes.
+     * @returns {this} The initialized CubeCollection.
      */
-    addCube(cube: Cube): void {
-        this.#cubes.push(cube)
+    initialize = (camera: Camera, tilemap: Tilemap): void =>
+        CUBE_SETTINGS.forEach(({ tilePoint, size }) => {
+            const tilePosition = cartesianToIsometric(tilePoint)
+            const offsets = calculateCubeOffsets(size)
 
-        this.#cubeContainer.addChild(cube.graphics)
-    }
+            const position = tilePosition.subtract(offsets)
+
+            const currentTile = tilemap.findTileByExactPosition(tilePosition)
+
+            const cube = new Cube(position, size).initialize
+                (
+                    camera,
+                    tilemap,
+                    this,
+                    currentTile
+                )
+
+            this.#addCube(cube)
+        })
 
     /**
      * Finds the tallest cube at a specified tile position, excluding a specific cube.
@@ -83,6 +107,17 @@ export default class CubeCollection {
         this.#cubeContainer.removeChildren()
 
         this.#cubes.forEach((cube) => this.#cubeContainer.addChild(cube.graphics))
+    }
+
+    /**
+     * Adds a cube to the collection and the cube container.
+     * @param {Cube} cube - The cube to add.
+     * @private
+     */
+    #addCube(cube: Cube): void {
+        this.#cubes.push(cube)
+
+        this.#cubeContainer.addChild(cube.graphics)
     }
 
     /**

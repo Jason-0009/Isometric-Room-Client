@@ -8,8 +8,22 @@ import PriorityQueue from '../utils/PriorityQueue'
  * A class for finding paths in a 3D grid using the A* algorithm.
  */
 export default class Pathfinder {
+    /**
+     * The 3D grid representing walkable and non-walkable tiles.
+     * @type {number[][]}
+     */
     readonly #grid: number[][]
+
+    /**
+     * The cost of diagonal movement in the grid.
+     * @type {number}
+     */
     readonly #DIAGONAL_COST: number = Math.sqrt(2)
+
+    /**
+     * The cost of horizontal and vertical movement in the grid.
+     * @type {number}
+     */
     readonly #HORIZONTAL_VERTICAL_COST: number = 1.0
 
     /**
@@ -28,8 +42,8 @@ export default class Pathfinder {
      */
     findPath(startPoint: Point3D, goalPoint: Point3D): Point3D[] | null {
         // Check if the start and goal points are valid tiles
-        if (!this.#isValidTile(startPoint) || !this.#isValidTile(goalPoint))
-            return null
+        if (!this.#isValidTile(startPoint) ||
+            !this.#isValidTile(goalPoint)) return null
 
         // Initialize the open list and closed list
         const openList = new PriorityQueue<Node>()
@@ -46,15 +60,10 @@ export default class Pathfinder {
 
         while (true) {
             // Dequeue the current node from the open list
-            const currentNode = openList.dequeue()
-
-            // If the current node is null, return null (no path found)
-            if (!currentNode)
-                return null
+            const currentNode = openList.dequeue()!
 
             // If the current node is the goal node, reconstruct and return the path
-            if (currentNode.position.equals(goalPoint))
-                return this.#reconstructPath(currentNode)
+            if (currentNode.position.equals(goalPoint)) return this.#reconstructPath(currentNode)
 
             // Add the current node to the closed list
             closedList.add(currentNode)
@@ -64,11 +73,11 @@ export default class Pathfinder {
 
             // Explore the neighbor points
             neighborPoints.forEach((neighborPoint) => {
-                if (!this.#isValidTile(neighborPoint))
-                    return
+                if (!this.#isValidTile(neighborPoint)) return
 
                 // Calculate costs for the neighbor node
-                const gCost = currentNode.gCost + this.#calculateGCost(currentNode, neighborPoint)
+                const gCost = currentNode.gCost +
+                    this.#calculateGCost(currentNode.position, neighborPoint)
                 const hCost = this.#calculateHeuristic(neighborPoint, goalPoint)
                 const fCost = gCost + hCost
 
@@ -76,16 +85,13 @@ export default class Pathfinder {
                 const neighborNode = new Node(neighborPoint, gCost, hCost, currentNode)
 
                 // Check if the neighbor node is in the open list or has a lower fCost
-                if (openList.contains(neighborNode) && fCost >= neighborNode.fCost)
-                    return
+                if (openList.contains(neighborNode) &&
+                    fCost >= neighborNode.fCost) return
 
                 // Enqueue the neighbor node
                 openList.enqueue(neighborNode, fCost)
             })
         }
-
-        // No path found
-        return null
     }
 
     /**
@@ -141,36 +147,38 @@ export default class Pathfinder {
      */
     #getNeighborPoints({ x, y, z }: Point3D): Point3D[] {
         const neighborPoints: Point3D[] = [
-            new Point3D(x - 1, y, z),
-            new Point3D(x + 1, y, z),
-            new Point3D(x, y - 1, z),
-            new Point3D(x, y + 1, z),
-            new Point3D(x - 1, y - 1, z),
-            new Point3D(x + 1, y + 1, z),
-            new Point3D(x - 1, y + 1, z),
-            new Point3D(x + 1, y - 1, z),
+            new Point3D(x - 1, y, z),         // Left
+            new Point3D(x + 1, y, z),         // Right
+            new Point3D(x, y - 1, z),         // Up
+            new Point3D(x, y + 1, z),         // Down
+            new Point3D(x - 1, y - 1, z),     // Upper-left
+            new Point3D(x + 1, y + 1, z),     // Lower-right
+            new Point3D(x - 1, y + 1, z),     // Lower-left
+            new Point3D(x + 1, y - 1, z),     // Upper-right
         ]
 
         return neighborPoints.filter((point) => this.#isValidTile(point))
     }
 
     /**
-     * Calculates the G cost (movement cost) between two points.
-     * @param {Node} currentNode - The current node.
-     * @param {Point3D} neighborPoint - The neighbor point to calculate the cost to.
-     * @returns {number} - The G cost between the points.
+     * Calculate the G cost (movement cost) between the current node's position
+     * and a neighbor point.
+     *
+     * @param {Point3D} currentNodePosition - The position of the current node.
+     * @param {Point3D} neighborPoint - The position of the neighbor point.
+     * @returns {number} The G cost between the two positions.
      */
-    #calculateGCost(currentNode: Node, neighborPoint: Point3D): number {
-        const { x, y, z } = currentNode.position
+    #calculateGCost(currentNodePosition: Point3D, neighborPoint: Point3D): number {
         const delta = new Point3D(
-            Math.abs(x - neighborPoint.x),
-            Math.abs(y - neighborPoint.y),
-            Math.abs(z - neighborPoint.z)
+            Math.abs(currentNodePosition.x - neighborPoint.x),
+            Math.abs(currentNodePosition.y - neighborPoint.y),
+            Math.abs(currentNodePosition.z - neighborPoint.z)
         )
-        const minDelta = Math.min(delta.x, delta.y, delta.z)
 
-        return minDelta > 0 ? this.#DIAGONAL_COST * minDelta :
-            this.#HORIZONTAL_VERTICAL_COST * minDelta
+        const minimumDelta = Math.min(delta.x, delta.y, delta.z)
+
+        return minimumDelta > 0 ? this.#DIAGONAL_COST * minimumDelta :
+            this.#HORIZONTAL_VERTICAL_COST * minimumDelta
     }
 
     /**

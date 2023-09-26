@@ -1,3 +1,7 @@
+import { CubeSettings } from '../types/Cube.types'
+
+import Point3D from '../utils/Point3D'
+
 /**
  * Represents color values for different faces of a cube.
  */
@@ -41,3 +45,10 @@ export const CUBE_COLORS: CubeColors = {
      */
     RIGHT_FACE: 0xFFD700,
 }
+
+export const CUBE_SETTINGS: CubeSettings[] = [
+    { tilePoint: new Point3D(0, 0, 0), size: 24 },
+    { tilePoint: new Point3D(0, 5, 0), size: 32 },
+    { tilePoint: new Point3D(1, 5, 0), size: 32 },
+    { tilePoint: new Point3D(2, 5, 0), size: 16 }
+]

@@ -2,13 +2,18 @@ import { Point, Polygon } from 'pixi.js'
 
 import Point3D from '../../utils/Point3D'
 
+import Pathfinder from '../../pathfinding/Pathfinder'
+
+import Avatar from '../avatar/Avatar'
+
 import TileGraphics from './TileGraphics'
 
-import { isometricToCartesian } from '../../utils/coordinateTransformations'
+import { cartesianToIsometric, isometricToCartesian } from '../../utils/coordinateTransformations'
 
-import { TILEMAP_GRID } from '../../constants/Tile.constants'
+import { TILE_GRID } from '../../constants/Tile.constants'
 
 import { TILE_SURFACE_POINTS } from '../../constants/Tile.constants'
+import { AVATAR_OFFSETS as AVATAR_OFFSETS } from '../../constants/Avatar.constants'
 
 /**
  * Represents a tile on a grid.
@@ -29,6 +34,20 @@ export default class Tile {
     readonly #graphics: TileGraphics
 
     /**
+     * The Pathfinder instance for pathfinding operations related to this tile.
+     * @type {Pathfinder}
+     * @private
+     */
+    #pathfinder!: Pathfinder
+
+    /**
+     * The Avatar object representing the character in the scene.
+     * @type {Avatar}
+     * @private
+     */
+    #avatar!: Avatar
+
+    /**
      * Creates a new Tile instance.
      * @param {Point3D} position - The position of the tile in isometric space.
      */
@@ -40,8 +59,37 @@ export default class Tile {
         const hasRightBorder = this.#isRightTileEmpty()
 
         this.#graphics = new TileGraphics(this.#position, hasLeftBorder, hasRightBorder)
+    }
+
+    /**
+     * Initializes the Tile by setting up its associated Pathfinder instance and Avatar.
+     * @param {Pathfinder} pathfinder - The Pathfinder instance for pathfinding operations related to this tile.
+     * @param {Avatar} avatar - The Avatar object representing the character in the scene.
+     * @returns {this} The initialized Tile instance.
+     */
+    initialize(pathfinder: Pathfinder, avatar: Avatar): this {
+        this.#pathfinder = pathfinder
+        this.#avatar = avatar
 
         this.#setupEventListeners()
+
+        return this
+    }
+
+    /**
+     * Checks if the given point is within the bounds of a tile.
+     * @param {Point} point - The point to check.
+     * @returns {boolean} True if the point is within the tile's bounds, otherwise false.
+     */
+    isPointWithinBounds(point: Point): boolean {
+        const transformedPoints = TILE_SURFACE_POINTS.map((surfacePoint, index) => {
+            const tileCoordinate = index % 2 === 0 ? this.#position.x : this.#position.y
+            return surfacePoint + tileCoordinate
+        })
+
+        const polygon = new Polygon(transformedPoints)
+
+        return polygon.contains(point.x, point.y)
     }
 
     /**
@@ -54,7 +102,7 @@ export default class Tile {
         const { x, y, z } = isometricToCartesian(this.#position)
 
         // Check if there is a tile to the bottom.
-        const leftTileZ = TILEMAP_GRID[x][y + 1]
+        const leftTileZ = TILE_GRID[x][y + 1]
 
         // Check if the tile to the bottom is either null or has a different `z` value.
         return !leftTileZ || leftTileZ !== z
@@ -70,7 +118,7 @@ export default class Tile {
         const { x, y, z } = isometricToCartesian(this.#position)
 
         // Check if there is a row to the right.
-        const nextRow = TILEMAP_GRID[x + 1]
+        const nextRow = TILE_GRID[x + 1]
 
         // There's no row to the right, so the tile is empty.
         if (!nextRow) return true
@@ -100,44 +148,37 @@ export default class Tile {
      * Creates a hover effect for the tile's graphics.
      * @private
      */
-    #handlePointerOver(): void {
+    #handlePointerOver = (): void =>
         this.#graphics.createHoverEffect()
-    }
 
     /**
      * Handles the 'pointerout' event (mouse pointer leaving the tile).
      * Destroys the hover effect for the tile's graphics.
      * @private
      */
-    #handlePointerOut(): void {
+    #handlePointerOut = (): void =>
         this.#graphics.destroyHoverEffect()
-    }
 
     /**
      * Handles the 'click' event (tile is clicked).
      * Converts the tile's isometric position to Cartesian coordinates and logs the result.
      * @private
      */
-    #handleClick(): void {
-        const { x, y, z } = isometricToCartesian(this.#position)
+    async #handleClick(): Promise<void> {
+        if (!this.#avatar.currentTile) return
+        
+        const start = isometricToCartesian(this.#avatar.currentTile.position)
+        const goal = isometricToCartesian(this.#position)
 
-        console.info(`Tile clicked at x: ${x}, y: ${y}, z: ${z}`)
-    }
+        const path = this.#pathfinder.findPath(start, goal)
 
-    /**
-     * Checks if the given point is within the bounds of a tile.
-     * @param {Point} point - The point to check.
-     * @returns {boolean} True if the point is within the tile's bounds, otherwise false.
-     */
-    isPointWithinBounds(point: Point): boolean {
-        const transformedPoints = TILE_SURFACE_POINTS.map((surfacePoint, index) => {
-            const tileCoordinate = index % 2 === 0 ? this.#position.x : this.#position.y
-            return surfacePoint + tileCoordinate
-        })
+        if (!path) {
+            console.error('No valid path found.')
 
-        const polygon = new Polygon(transformedPoints)
+            return
+        }
 
-        return polygon.contains(point.x, point.y)
+        await this.#avatar.moveAlongPath(path)
     }
 
     /**

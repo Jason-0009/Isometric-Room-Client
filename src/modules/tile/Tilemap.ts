@@ -1,5 +1,7 @@
 import { Container, Point } from 'pixi.js'
 
+import Avatar from '../avatar/Avatar'
+
 import Tile from './Tile'
 
 import Wall from '../wall/Wall'
@@ -8,51 +10,69 @@ import WallDirection from '../wall/WallDirection'
 import { cartesianToIsometric } from '../../utils/coordinateTransformations'
 import Point3D from '../../utils/Point3D'
 
-import { TILEMAP_GRID } from '../../constants/Tile.constants'
+import { TILE_GRID } from '../../constants/Tile.constants'
+import Pathfinder from '../../pathfinding/Pathfinder'
 
 /**
  * Represents a tilemap containing a grid of tiles and walls.
  */
 export default class Tilemap {
     /**
-     * The container for walls in the tilemap.
-     * @type {Container}
-     * @private
-     */
-    #wallContainer: Container
-
-    /**
      * Array of tiles in the tilemap.
      * @type {Tile[]}
      * @private
      */
-    #tiles: Tile[]
-    
+    readonly #tiles: Tile[]
+
     /**
      * The container for tiles in the tilemap.
      * @type {Container}
      * @private
      */
-    #tileContainer: Container
+    readonly #tileContainer: Container
 
     /**
-     * Creates a Tilemap instance.
-     * @param {Container} wallContainer - The container for walls in the tilemap.
+     * The container for walls in the tilemap.
+     * @type {Container}
+     * @private
      */
-    constructor(wallContainer: Container) {
-        this.#wallContainer = wallContainer
+    #wallContainer!: Container
 
+    #avatar!: Avatar
+
+    /**
+     * The pathfinding algorithm used for finding paths on the tilemap grid.
+     * @type {Pathfinder}
+     * @private
+     */
+    #pathfinder!: Pathfinder
+
+    /**
+     * Creates a Tilemap instance. */
+    constructor() {
         this.#tiles = []
-        this.#tileContainer = new Container()
 
-        this.generateTilemap()
+        this.#tileContainer = new Container()
+    }
+
+    /**
+     * Initializes the Tilemap by setting up the wall container, avatar, and pathfinder.
+     * @param {Container} wallContainer - The container for walls in the tilemap.
+     * @param {Avatar} avatar - The Avatar object representing the character in the scene.
+     */
+    initialize(wallContainer: Container, avatar: Avatar) {
+        this.#wallContainer = wallContainer
+        this.#avatar = avatar
+        this.#pathfinder = new Pathfinder(TILE_GRID)
+
+        this.#generate()
     }
 
     /**
      * Generates the tilemap based on the TILE_GRID configuration.
      */
-    generateTilemap(): void {
-        TILEMAP_GRID.forEach((row, rowIndex) => {
+    #generate(): void {
+        TILE_GRID.forEach((row, rowIndex) => {
             row.forEach((height, columnIndex) => {
                 if (height === -1) return
 
@@ -109,14 +129,14 @@ export default class Tilemap {
      * @param position - The position of the tile.
      */
     #addTile(position: Point3D): void {
-        const tile = new Tile(position)
+        const tile = new Tile(position).initialize(this.#pathfinder, this.#avatar)
 
         this.#tiles.push(tile)
 
         this.#tileContainer.addChild(tile.graphics)
     }
 
-    getTileByExactPosition = (position: Point3D): Tile | undefined =>
+    findTileByExactPosition = (position: Point3D): Tile | undefined =>
         this.#tiles.find(tile => tile.position.equals(position))
 
     /**
@@ -124,7 +144,7 @@ export default class Tilemap {
      * @param position - The point to search for.
      * @returns The first matching Tile object or null if not found.
      */
-    getTileByPositionInBounds = (position: Point): Tile | undefined =>
+    findTileByPositionInBounds = (position: Point): Tile | undefined =>
         this.#tiles.find(tile => tile.isPointWithinBounds(position))
 
     /**

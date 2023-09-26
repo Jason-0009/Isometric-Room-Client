@@ -1,12 +1,4 @@
 /**
- * Represents an element in the priority queue.
- */
-type PriorityQueueElement<T> = {
-    value: T         // The value stored in the element.
-    priority: number // The priority associated with the value.
-}
-
-/**
  * A priority queue data structure.
  * Elements are stored based on their priority, with higher-priority elements
  * at the front of the queue.

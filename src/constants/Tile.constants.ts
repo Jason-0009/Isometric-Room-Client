@@ -107,7 +107,7 @@ export const TILE_SURFACE_POINTS: number[] = [
  * Each cell can have a height value (number) or be empty (null).
  * @type {(number | null)[][]}
  */
-export const TILEMAP_GRID: number[][] = [
+export const TILE_GRID: number[][] = [
     [0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0]

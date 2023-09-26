@@ -25,21 +25,21 @@ export default class Camera {
      * @type {boolean}
      * @private
      */
-    #enabled: boolean = true
+    #enabled: boolean
 
     /**
      * Initial pointer position for panning.
      * @type {Point | null}
      * @private
      */
-    #initialDragPosition: Point | null = null
+    #initialDragPosition: Point | null
 
     /**
      * Initial zoom factor.
      * @type {number}
      * @private
      */
-    #zoomFactor: number = 0.1
+    #zoomFactor: number
 
     /**
      * Create a new Camera instance.
@@ -50,6 +50,10 @@ export default class Camera {
         this.#view = view
         this.#stage = stage
 
+        this.#enabled = true
+        this.#initialDragPosition = null
+        this.#zoomFactor = 0.1
+
         this.#setupEventListeners()
     }
 
@@ -59,11 +63,11 @@ export default class Camera {
      */
     #setupEventListeners(): void {
         // Add event listeners for pointer (drag) and mouse wheel (zoom) events
-        this.#view.addEventListener('pointerdown', this.#onPointerDown)
-        this.#view.addEventListener('pointermove', this.#onPointerMove)
-        this.#view.addEventListener('pointerup', this.#onPointerUp)
+        this.#view.addEventListener('pointerdown', this.#onPointerDown.bind(this))
+        this.#view.addEventListener('pointermove', this.#onPointerMove.bind(this))
+        this.#view.addEventListener('pointerup', this.#onPointerUp.bind(this))
 
-        this.#view.addEventListener('wheel', this.#onMouseWheel)
+        this.#view.addEventListener('wheel', this.#onMouseWheel.bind(this))
     }
 
     /**
@@ -71,7 +75,7 @@ export default class Camera {
      * @param {MouseEvent} event - The MouseEvent or TouchEvent.
      * @private
      */
-    #onPointerDown = (event: MouseEvent): void => {
+    #onPointerDown(event: MouseEvent): void {
         if (!this.#enabled) return
 
         // Store the initial pointer position for panning
@@ -83,7 +87,7 @@ export default class Camera {
      * @param {MouseEvent} event - The MouseEvent or TouchEvent.
      * @private
      */
-    #onPointerMove = (event: MouseEvent): void => {
+    #onPointerMove(event: MouseEvent): void {
         if (!this.#enabled || !this.#initialDragPosition) return
 
         // Calculate the change in pointer position
@@ -113,7 +117,7 @@ export default class Camera {
      * @param {WheelEvent} event - The WheelEvent.
      * @private
      */
-    #onMouseWheel = (event: WheelEvent): void => {
+    #onMouseWheel(event: WheelEvent): void {
         if (!this.#enabled) return
 
         // Adjust the zoom factor based on wheel delta (positive for zoom in, negative for zoom out)
@@ -126,15 +130,7 @@ export default class Camera {
         this.#stage.scale.set(this.#zoomFactor)
     }
 
-    /**
-     * Enable camera controls.
-     * @returns {boolean}
-     */
-    enableControls = (): boolean => this.#enabled = true;
-
-    /**
-     * Disable camera controls.
-     * @returns {boolean}
-     */
-    disableControls = (): boolean => this.#enabled = false;
+    set enabled(enabled: boolean) {
+        this.#enabled = enabled
+    }
 }

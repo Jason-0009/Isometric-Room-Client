@@ -13,6 +13,7 @@ import Tile from '../tile/Tile'
 import CubeGraphics from './CubeGraphics'
 
 import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
+import { calculateCubeOffsets, calculateStackingOffsets } from '../../utils/offsetCalculations'
 
 /**
  * Represents a cube object with interactivity and positioning.
@@ -20,57 +21,57 @@ import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
 export default class Cube {
     /**
      * The 3D position of the cube.
-     * @private
      * @type {Point3D}
+     * @private
      */
     readonly #position: Point3D
 
     /**
      * The size of the cube.
-     * @private
      * @type {number}
+     * @private
      */
     readonly #size: number
+
+    /**
+     * The graphics object representing the cube.
+     * @type {CubeGraphics}
+     * @private
+     */
+    readonly #graphics: CubeGraphics
 
     /**
      * The camera object for controlling the view.
      * @private
      * @type {Camera}
      */
-    readonly #camera: Camera
+    #camera!: Camera
 
     /**
      * The tilemap where the cube exists.
-     * @private
      * @type {Tilemap}
+     * @private
      */
-    readonly #tilemap: Tilemap
+    #tilemap!: Tilemap
 
     /**
      * The repository managing cubes.
-     * @private
      * @type {CubeCollection}
-     */
-    readonly #cubeCollection: CubeCollection
-
-    /**
-     * The graphics object representing the cube.
      * @private
-     * @type {CubeGraphics}
      */
-    readonly #graphics: CubeGraphics
+    #cubeCollection!: CubeCollection
 
     /**
      * The current tile the cube is on.
-     * @private
      * @type {Tile | undefined}
+     * @private
      */
     #currentTile: Tile | undefined
 
     /**
      * A flag indicating whether the cube is being dragged.
-     * @private
      * @type {boolean}
+     * @private
      */
     #isDragging: boolean = false
 
@@ -78,38 +79,27 @@ export default class Cube {
      * Creates a new Cube instance.
      * @param {Point3D} position - The 3D position of the cube.
      * @param {number} size - The size of the cube.
-     * @param {Camera} camera - The camera object for controlling the view.
-     * @param {Tilemap} tilemap - The tilemap where the cube exists.
-     * @param {CubeCollection} cubeCollection - The repository managing cubes.
      */
-    constructor(
-        size: number,
-        position: Point3D,
-        camera: Camera,
-        tilemap: Tilemap,
-        cubeCollection: CubeCollection
-    ) {
+    constructor(position: Point3D, size: number) {
+        this.#position = position
+
         // Ensure the size is within a valid range
         this.#size = Math.max(8, Math.min(size, TILE_DIMENSIONS.HEIGHT))
 
-        const tileOffsets = this.#calculateTileOffsets()
-
-        this.#position = position.subtract(tileOffsets)
-
-        this.#camera = camera
-
-        this.#tilemap = tilemap
-
-        this.#cubeCollection = cubeCollection
-
         this.#graphics = new CubeGraphics(this.#position, this.#size)
+    }
 
-        const tilePosition = this.#position.add(tileOffsets)
+    initialize(camera: Camera, tilemap: Tilemap,
+        cubeCollection: CubeCollection, currentTile: Tile | undefined): this {
+            
+        this.#camera = camera
+        this.#tilemap = tilemap
+        this.#cubeCollection = cubeCollection
+        this.#currentTile = currentTile
 
-        this.#currentTile = tilemap.getTileByExactPosition(tilePosition)
-
-        // Set up event listeners for interactivity
         this.#setupEventListeners()
+
+        return this
     }
 
     /**
@@ -162,7 +152,7 @@ export default class Cube {
         this.#isDragging = true
 
         // Disable camera controls during dragging
-        this.#camera.disableControls()
+        this.#camera.enabled = false
     }
 
     /**
@@ -180,7 +170,7 @@ export default class Cube {
         const pointerPosition = this.#tilemap.tileContainer.toLocal(event)
 
         // Get the tile at the new pointer position
-        const newTile = this.#tilemap.getTileByPositionInBounds(pointerPosition)
+        const newTile = this.#tilemap.findTileByPositionInBounds(pointerPosition)
 
         if (!newTile) return
 
@@ -205,7 +195,7 @@ export default class Cube {
         this.#isDragging = false
 
         // Enable camera controls after dragging
-        this.#camera.enableControls()
+        this.#camera.enabled = true
     }
 
     /**
@@ -225,8 +215,8 @@ export default class Cube {
 
         // Calculate stacking offsets if there's a cube on the target tile's stack; otherwise, calculate tile offsets
         const offsets = cubeOnTargetTile
-            ? this.#calculateStackingOffsets(cubeOnTargetTile)
-            : this.#calculateTileOffsets()
+            ? calculateStackingOffsets(cubeOnTargetTile, this)
+            : calculateCubeOffsets(this.#size)
 
         // Calculate the new position based on the offsets
         const newPosition = cubeOnTargetTile
@@ -262,30 +252,6 @@ export default class Cube {
     }
 
     /**
-     * Calculate the 3D offsets from a tile to a cube.
-     * @returns {Point} The 3D offsets.
-     * @private
-     */
-    #calculateTileOffsets = (): Point =>
-        new Point(
-            this.#size - TILE_DIMENSIONS.WIDTH / 2,
-            this.#size - TILE_DIMENSIONS.HEIGHT / 2,
-        )
-
-    /**
-     * Calculate the stacking offsets for stacking one cube on top of another.
-     * @param {Cube} cube - The cube to stack on.
-     * @returns {Point3D} The 3D stacking offsets.
-     * @private
-     */
-    #calculateStackingOffsets = (cube: Cube): Point3D =>
-        new Point3D(
-            cube.#size - this.#size,
-            cube.#size - this.#size,
-            cube.#size
-        )
-
-    /**
      * Get the current position of the cube.
      * @returns {Point3D} The current position.
      */
@@ -294,11 +260,11 @@ export default class Cube {
     }
 
     /**
-     * Get the current tile the cube is on.
-     * @returns {Tile | undefined} The current tile.
+     * Get the size of the cube.
+     * @returns {number} The size.
      */
-    get currentTile(): Tile | undefined {
-        return this.#currentTile
+    get size(): number {
+        return this.#size
     }
 
     /**
@@ -307,5 +273,13 @@ export default class Cube {
      */
     get graphics(): CubeGraphics {
         return this.#graphics
+    }
+
+    /**
+     * Get the current tile the cube is on.
+     * @returns {Tile | undefined} The current tile.
+     */
+    get currentTile(): Tile | undefined {
+        return this.#currentTile
     }
 }
