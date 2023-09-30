@@ -99,6 +99,8 @@ export default class Point3D {
     normalize(): Point3D {
         const magnitude = Math.hypot(this.x, this.y, this.z)
 
+        // console.log(magnitude)
+
         return magnitude === 0 ? new Point3D(0, 0, 0) :
             new Point3D(this.x / magnitude, this.y / magnitude, this.z / magnitude)
     }
@@ -109,13 +111,8 @@ export default class Point3D {
      * @returns {Point3D} A new Point3D scaled by the factor.
      */
     scale = (factor: number): Point3D =>
-        new Point3D(this.x * factor, this.y * factor, this.z * factor);
+        new Point3D(this.x * factor, this.y * factor, this.z * factor)
 
-    /**
-     * Returns a string representation of the Point3D.
-     * @returns {string} A string representation of the Point3D.
-     */
-    toString = (): string => `Point3D(${this.#x}, ${this.#y}, ${this.#z})`
 
     /**
      * Gets the x-coordinate of the point.

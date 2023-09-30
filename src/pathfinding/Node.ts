@@ -45,7 +45,8 @@ export default class Node {
      * @param {number} gCost - The cost from the start node to this node (gCost).
      * @param {number} hCost - The heuristic (estimated) cost from this node to the goal node (hCost).
      */
-    constructor(position: Point3D, gCost: number, hCost: number, parent: Node | null = null) {
+    constructor(position: Point3D, gCost: number = 0,
+        hCost: number = 0, parent: Node | null = null) {
         this.#position = position
 
         this.#gCost = gCost
@@ -56,11 +57,15 @@ export default class Node {
     }
 
     /**
-     * Get a string representation of the Node.
-     * @returns {string} - A string representation of the Node.
+     * Check if this node is equal to another node.
+     * @param {Node} node - The other node to compare.
+     * @returns {boolean} - True if the nodes are equal, false otherwise.
      */
-    toString = (): string =>
-        `Node(position: ${this.#position}, gCost: ${this.#gCost}, hCost: ${this.#hCost}, fCost: ${this.#fCost}`
+    equals = (node: Node): boolean =>
+        this.#position.equals(node.position) &&
+        this.#gCost === node.gCost &&
+        this.#hCost === node.hCost &&
+        this.#fCost === node.fCost
 
     /**
      * Get the position of the node.
@@ -133,9 +138,9 @@ export default class Node {
 
     /**
      * Set the parent node for tracing the path.
-     * @param {Node | null} value - The parent node of this node.
+     * @param {number} value - The parent node of this node.
      */
-    set parent(value: Node | null) {
+    set parent(value: Node) {
         this.#parent = value
     }
 }

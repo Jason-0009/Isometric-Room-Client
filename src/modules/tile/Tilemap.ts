@@ -1,17 +1,18 @@
 import { Container, Point } from 'pixi.js'
 
-import Avatar from '../avatar/Avatar'
-
 import Tile from './Tile'
 
 import Wall from '../wall/Wall'
 import WallDirection from '../wall/WallDirection'
 
+import Avatar from '../avatar/Avatar'
+
+import Pathfinder from '../../pathfinding/Pathfinder'
+
 import { cartesianToIsometric } from '../../utils/coordinateTransformations'
 import Point3D from '../../utils/Point3D'
 
 import { TILE_GRID } from '../../constants/Tile.constants'
-import Pathfinder from '../../pathfinding/Pathfinder'
 
 /**
  * Represents a tilemap containing a grid of tiles and walls.
@@ -38,6 +39,11 @@ export default class Tilemap {
      */
     #wallContainer!: Container
 
+    /**
+     * The avatar object used within the tilemap.
+     * @type {Avatar}
+     * @private
+     */
     #avatar!: Avatar
 
     /**
@@ -48,7 +54,8 @@ export default class Tilemap {
     #pathfinder!: Pathfinder
 
     /**
-     * Creates a Tilemap instance. */
+     * Creates a Tilemap instance. 
+     */
     constructor() {
         this.#tiles = []
 
@@ -60,13 +67,30 @@ export default class Tilemap {
      * @param {Container} wallContainer - The container for walls in the tilemap.
      * @param {Avatar} avatar - The Avatar object representing the character in the scene.
      */
-    initialize(wallContainer: Container, avatar: Avatar) {
+    initialize(wallContainer: Container, avatar: Avatar, pathfinder: Pathfinder) {
         this.#wallContainer = wallContainer
         this.#avatar = avatar
-        this.#pathfinder = new Pathfinder(TILE_GRID)
+        this.#pathfinder = pathfinder
 
         this.#generate()
     }
+
+    /**
+     * Finds a tile at the specified exact position (x, y, z).
+     *
+     * @param {Point3D} position - The exact position to search for.
+     * @returns {Tile | undefined} The found Tile object, or undefined if not found.
+     */
+    findTileByExactPosition = (position: Point3D): Tile | undefined =>
+        this.#tiles.find(tile => tile.position.equals(position))
+
+    /**
+     * Finds a tile at the specified point, considering tile bounds.
+     * @param position - The point to search for.
+     * @returns The first matching Tile object or null if not found.
+     */
+    findTileByPositionInBounds = (position: Point): Tile | undefined =>
+        this.#tiles.find(tile => tile.isPointWithinBounds(position))
 
     /**
      * Generates the tilemap based on the TILE_GRID configuration.
@@ -129,23 +153,12 @@ export default class Tilemap {
      * @param position - The position of the tile.
      */
     #addTile(position: Point3D): void {
-        const tile = new Tile(position).initialize(this.#pathfinder, this.#avatar)
+        const tile = new Tile(position).initialize(this.#avatar, this.#pathfinder)
 
         this.#tiles.push(tile)
 
         this.#tileContainer.addChild(tile.graphics)
     }
-
-    findTileByExactPosition = (position: Point3D): Tile | undefined =>
-        this.#tiles.find(tile => tile.position.equals(position))
-
-    /**
-     * Finds a tile at the specified point, considering tile bounds.
-     * @param position - The point to search for.
-     * @returns The first matching Tile object or null if not found.
-     */
-    findTileByPositionInBounds = (position: Point): Tile | undefined =>
-        this.#tiles.find(tile => tile.isPointWithinBounds(position))
 
     /**
      * Retrieves the container containing the tilemap.

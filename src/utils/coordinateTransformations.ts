@@ -21,8 +21,12 @@ export const cartesianToIsometric = (position: Point3D): Point3D => {
  * @returns {Point3D} An object containing the converted cartesian coordinates (x, y, z).
  */
 export const isometricToCartesian = (position: Point3D): Point3D => {
-    const x: number = (position.x / (TILE_DIMENSIONS.WIDTH / 2) + position.y / (TILE_DIMENSIONS.HEIGHT / 2)) / 2
-    const y: number = (position.y / (TILE_DIMENSIONS.HEIGHT / 2) - position.x / (TILE_DIMENSIONS.WIDTH / 2)) / 2
+    const x: number = (position.x / (TILE_DIMENSIONS.WIDTH / 2) +
+        position.y / (TILE_DIMENSIONS.HEIGHT / 2)) / 2
+        
+    const y: number = (position.y / (TILE_DIMENSIONS.HEIGHT / 2) -
+        position.x / (TILE_DIMENSIONS.WIDTH / 2)) / 2
+
     const z: number = position.z / TILE_DIMENSIONS.HEIGHT
 
     return new Point3D(x, y, z)

@@ -2,11 +2,11 @@ import Pathfinder from '../pathfinding/Pathfinder'
 
 import Point3D from '../utils/Point3D'
 
-describe('Pathfinder', () => {
+describe('pathfinder', () => {
     // Define a sample grid for testing
     const grid = [
-        [0, 1, 0, 0, 0],
-        [0, -1, 0, -1, 0],
+        [0, -1, 0, 0, 0],
+        [-1, -1, 0, -1, 0],
         [0, 1, 0, 0, 0],
         [0, 0, 0, -1, 0],
         [0, 0, 0, 1, 0],

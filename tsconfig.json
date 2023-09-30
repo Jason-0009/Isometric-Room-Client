@@ -4,8 +4,6 @@
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
         "module": "CommonJS",
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
         "outDir": "./dist",
         "strict": true
     }

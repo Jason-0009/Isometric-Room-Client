@@ -1,26 +1,6 @@
-import { CubeSettings } from '../types/Cube.types'
+import { CubeSettings, CubeColors } from '../types/Cube.types'
 
 import Point3D from '../utils/Point3D'
-
-/**
- * Represents color values for different faces of a cube.
- */
-type CubeColors = {
-    /**
-     * The color of the top face of the cube.
-     */
-    TOP_FACE: number
-
-    /**
-     * The color of the left face of the cube.
-     */
-    LEFT_FACE: number
-
-    /**
-     * The color of the right face of the cube.
-     */
-    RIGHT_FACE: number
-}
 
 /**
  * Contains color values for different faces of a cube.

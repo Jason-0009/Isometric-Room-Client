@@ -66,7 +66,6 @@ export default class Camera {
         this.#view.addEventListener('pointerdown', this.#onPointerDown.bind(this))
         this.#view.addEventListener('pointermove', this.#onPointerMove.bind(this))
         this.#view.addEventListener('pointerup', this.#onPointerUp.bind(this))
-
         this.#view.addEventListener('wheel', this.#onMouseWheel.bind(this))
     }
 
@@ -110,7 +109,7 @@ export default class Camera {
      */
     #onPointerUp = (): null =>
         // Reset the initial pointer position on pointer up
-        this.#initialDragPosition = null;
+        this.#initialDragPosition = null
 
     /**
      * Handle mouse wheel (scroll) event for zooming.
@@ -130,6 +129,11 @@ export default class Camera {
         this.#stage.scale.set(this.#zoomFactor)
     }
 
+    /**
+     * Set the enabled status of the object.
+     *
+     * @param {boolean} enabled - The new enabled status. Set to `true` to enable, `false` to disable.
+     */
     set enabled(enabled: boolean) {
         this.#enabled = enabled
     }

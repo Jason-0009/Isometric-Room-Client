@@ -6,9 +6,13 @@ import Tilemap from '../modules/tile/Tilemap'
 import Avatar from '../modules/avatar/Avatar'
 import CubeCollection from '../modules/cube/CubeCollection'
 
+import Pathfinder from '../pathfinding/Pathfinder'
+
 import { cartesianToIsometric } from '../utils/coordinateTransformations'
 
-import { AVATAR_TILE_POINT as AVATAR_TILE_POINT, AVATAR_OFFSETS } from '../constants/Avatar.constants'
+import { AVATAR_INITIAL_POSITION, AVATAR_OFFSETS } from '../constants/Avatar.constants'
+import { TILE_GRID } from '../constants/Tile.constants'
+import Point3D from '../utils/Point3D'
 
 
 /**
@@ -58,6 +62,13 @@ export default class Scene {
     readonly #cubeCollection: CubeCollection
 
     /**
+     * The pathfinding algorithm used for finding paths on the tilemap grid.
+     * @type {Pathfinder}
+     * @private
+     */
+    readonly #pathfinder: Pathfinder
+
+    /**
      * Creates a new Scene instance.
      * @param {Application} application - The application instance.
      */
@@ -73,11 +84,19 @@ export default class Scene {
 
         this.#cubeCollection = new CubeCollection()
 
-        const avatarPosition = cartesianToIsometric(AVATAR_TILE_POINT).add(AVATAR_OFFSETS)
-
         // Create the avatar object
-        this.#avatar = new Avatar(avatarPosition)
+        this.#avatar = new Avatar(this.#calculateInitialAvatarPosition())
+
+        this.#pathfinder = new Pathfinder(TILE_GRID)
     }
+
+    /**
+     * Calculates the initial position for the avatar.
+     * @returns {Point}
+     * @private
+     */
+    #calculateInitialAvatarPosition = (): Point3D =>
+        cartesianToIsometric(AVATAR_INITIAL_POSITION).add(AVATAR_OFFSETS)
 
     /**
      * Initializes the scene by adding containers and objects to the stage.
@@ -85,16 +104,25 @@ export default class Scene {
      */
     initialize() {
         this.#initializeTilemap()
-
-        this.#initializeCubes()
-
+        // this.#initializeCubes()
         this.#initializeAvatar()
 
         this.#addObjectsToStage()
-
         this.centerStage()
 
         this.#startTicker()
+    }
+
+    /**
+     * Centers the stage within the viewport.
+     * @private
+     */
+    centerStage() {
+        const { screen, stage } = this.#application
+
+        const centerPosition = new Point(screen.width / 2, screen.height / 2)
+
+        stage.position.copyFrom(centerPosition)
     }
 
     /**
@@ -102,7 +130,7 @@ export default class Scene {
      * @private
      */
     #initializeTilemap = () =>
-        this.#tilemap.initialize(this.#wallContainer, this.#avatar)
+        this.#tilemap.initialize(this.#wallContainer, this.#avatar, this.#pathfinder)
 
     /**
      * Initializes the cube collection.
@@ -116,7 +144,8 @@ export default class Scene {
      * @private
      */
     #initializeAvatar() {
-        const tilePoint = cartesianToIsometric(AVATAR_TILE_POINT)
+        const tilePoint = cartesianToIsometric(AVATAR_INITIAL_POSITION)
+
         const currentTile = this.#tilemap.findTileByExactPosition(tilePoint)
 
         if (!currentTile) return
@@ -135,18 +164,6 @@ export default class Scene {
             this.#cubeCollection.cubeContainer,
             this.#avatar.graphics
         )
-
-    /**
-     * Centers the stage within the viewport.
-     * @private
-     */
-    centerStage() {
-        const { screen, stage } = this.#application
-
-        const centerPosition = new Point(screen.width / 2, screen.height / 2)
-
-        stage.position.copyFrom(centerPosition)
-    }
 
     /**
      * Starts the ticker for scene updates.

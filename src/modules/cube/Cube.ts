@@ -1,19 +1,17 @@
-import { FederatedPointerEvent, Point } from 'pixi.js'
-
-import Point3D from '../../utils/Point3D'
+import { FederatedPointerEvent } from 'pixi.js'
 
 import Camera from '../../core/Camera'
 
 import Tilemap from '../tile/Tilemap'
-
-import CubeCollection from './CubeCollection'
-
 import Tile from '../tile/Tile'
 
+import CubeCollection from './CubeCollection'
 import CubeGraphics from './CubeGraphics'
 
-import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
+import Point3D from '../../utils/Point3D'
 import { calculateCubeOffsets, calculateStackingOffsets } from '../../utils/offsetCalculations'
+
+import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
 
 /**
  * Represents a cube object with interactivity and positioning.
@@ -224,7 +222,7 @@ export default class Cube {
             : tile.position.subtract(offsets)
 
         // Update the position
-        this.#setPosition(newPosition)
+        this.#updatePosition(newPosition)
 
         // Update the currentTile property
         this.#currentTile = tile
@@ -240,11 +238,11 @@ export default class Cube {
         this.#size > cube.#size
 
     /**
-     * Set the cube's position and update its graphics.
+     * Update the cube's position and graphics.
      * @param {Point3D} position - The new position for the cube.
      * @private
      */
-    #setPosition(position: Point3D): void {
+    #updatePosition(position: Point3D): void {
         this.#position.copyFrom(position)
 
         // Update the graphics position

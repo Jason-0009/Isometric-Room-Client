@@ -1,8 +1,10 @@
-import Point3D from '../utils/Point3D'
+import { Point } from 'pixi.js'
+
+import Heap from 'heap-js'
 
 import Node from './Node'
 
-import PriorityQueue from '../utils/PriorityQueue'
+import Point3D from '../utils/Point3D'
 
 /**
  * A class for finding paths in a 3D grid using the A* algorithm.
@@ -41,81 +43,81 @@ export default class Pathfinder {
      * @returns {Point3D[] | null} - An array of points representing the path, or null if no path is found.
      */
     findPath(startPoint: Point3D, goalPoint: Point3D): Point3D[] | null {
-        // Check if the start and goal points are valid tiles
-        if (!this.#isValidTile(startPoint) ||
-            !this.#isValidTile(goalPoint)) return null
+        // Check if the start and goal points are valid tiles.
+        if (!this.#isValidTile(startPoint) || !this.#isValidTile(goalPoint)) return null
 
-        // Initialize the open list and closed list
-        const openList = new PriorityQueue<Node>()
+        // Sort nodes by lowest estimated total cost (fCost)
+        const comparator = (nodeA: Node, nodeB: Node) => nodeA.fCost - nodeB.fCost
+
+        // Initialize an open list to store nodes to be explored.
+        const openList = new Heap<Node>(comparator)
+
+        // Initialize a closed list to store nodes that have been explored.
         const closedList = new Set<Node>()
 
-        // Calculate the initial heuristic cost from the start to goal
         const gCost = 0
-        const hCost = this.#calculateHeuristic(startPoint, goalPoint)
+        const hCost = startPoint.distanceTo(goalPoint)
 
-        // Create the starting node and enqueue it
+        // Create the starting node with initial values.
         const startNode = new Node(startPoint, gCost, hCost)
 
-        openList.enqueue(startNode, startNode.fCost)
+        // Enqueue the starting node to the open list with its fCost as the priority.
+        openList.add(startNode)
 
-        while (true) {
-            // Dequeue the current node from the open list
-            const currentNode = openList.dequeue()!
+        // Start the main pathfinding loop.
+        while (!openList.isEmpty()) {
+            // Dequeue the node with the lowest fCost from the open list.
+            const currentNode = openList.pop()
 
-            // If the current node is the goal node, reconstruct and return the path
-            if (currentNode.position.equals(goalPoint)) return this.#reconstructPath(currentNode)
+            // If there are no more nodes in the open list, break out of the loop (no path found).
+            if (!currentNode) break
 
-            // Add the current node to the closed list
+            // Add the current node to the closed list to mark it as explored.
             closedList.add(currentNode)
 
-            // Get the neighbor points of the current node
-            const neighborPoints = this.#getNeighborPoints(currentNode.position)
+            // If the current node's position matches the goal, reconstruct and return the path.
+            if (currentNode.position.equals(goalPoint)) return this.#reconstructPath(currentNode)
 
-            // Explore the neighbor points
-            neighborPoints.forEach((neighborPoint) => {
-                if (!this.#isValidTile(neighborPoint)) return
+            // Get the neighbor nodes of the current node.
+            const neighborNodes = this.#getNeighborNodes(currentNode)
 
-                // Calculate costs for the neighbor node
-                const gCost = currentNode.gCost +
-                    this.#calculateGCost(currentNode.position, neighborPoint)
-                const hCost = this.#calculateHeuristic(neighborPoint, goalPoint)
+            // Iterate through the neighbor nodes.
+            neighborNodes.forEach(neighborNode => {
+                // Calculate the gCost from the current node to this neighbor node.
+                const gCost = this.#calculateGCost(currentNode, neighborNode)
+
+                // Calculate the heuristic (hCost) from this neighbor node to the goal.
+                const hCost = neighborNode.position.distanceTo(goalPoint)
+
+                // Calculate the fCost (sum of gCost and hCost) for the neighbor node.
                 const fCost = gCost + hCost
 
-                // Create the neighbor node
-                const neighborNode = new Node(neighborPoint, gCost, hCost, currentNode)
+                neighborNode.gCost = gCost
+                neighborNode.hCost = hCost
+                neighborNode.fCost = fCost
+                neighborNode.parent = currentNode
 
-                // Check if the neighbor node is in the open list or has a lower fCost
-                if (openList.contains(neighborNode) &&
-                    fCost >= neighborNode.fCost) return
+                // Check if the neighbor node is already in the closed list.
+                if ([...closedList].some(node => node.equals(neighborNode))) return
 
-                // Enqueue the neighbor node
-                openList.enqueue(neighborNode, fCost)
+                // Add the neighbor node to the open list with updated costs.
+                openList.push(neighborNode)
             })
         }
+
+        // No path found, return null.
+        return null
     }
 
-    /**
-     * Checks if a given point is a valid walkable tile within the grid.
-     * @param {Point3D} point - The point to check.
-     * @returns {boolean} - True if the point is a valid walkable tile, false otherwise.
-     */
-    #isValidTile = (point: Point3D): boolean =>
-        this.#isInBounds(point) && this.#isWalkableTile(point)
-
-    /**
-     * Checks if a given point is within the bounds of the grid.
-     * @param {Point3D} point - The point to check.
-     * @returns {boolean} - True if the point is within bounds, false otherwise.
-     */
-    #isInBounds = ({ x, y }: Point3D): boolean =>
-        x >= 0 && x < this.#grid.length && y >= 0 && y < this.#grid[0].length
 
     /**
      * Checks if a given point is a walkable tile (not blocked).
      * @param {Point3D} point - The point to check.
      * @returns {boolean} - True if the point is a walkable tile, false otherwise.
      */
-    #isWalkableTile({ x, y }: Point3D): boolean {
+    #isValidTile({ x, y }: Point3D): boolean {
+        if (x < 0 || x >= this.#grid.length || y < 0) return false
+
         const tile = this.#grid[x]?.[y]
 
         return tile !== -1 && tile !== undefined
@@ -123,22 +125,30 @@ export default class Pathfinder {
 
     /**
      * Reconstructs the path from the goal node to the start node.
-     * @param {Node} node - The goal node.
+     * @param {Node} goalNode - The goal node.
      * @returns {Point3D[]} - An array of points representing the reconstructed path.
      */
-    #reconstructPath(node: Node): Point3D[] {
+    #reconstructPath(goalNode: Node): Point3D[] {
         const path: Point3D[] = []
 
-        let current: Node | null = node
+        let currentNode: Node | null = goalNode
 
-        while (current) {
-            path.unshift(current.position)
+        while (currentNode) {
+            path.push(currentNode.position)
 
-            current = current.parent
+            currentNode = currentNode.parent
         }
 
         return path
     }
+
+    /**
+     * Gets the neighbor nodes of a given node.
+     * @param {Node} currentNode - The current node.
+     * @returns {Node[]} An array of neighbor nodes.
+     */
+    #getNeighborNodes = ({ position }: Node): Node[] =>
+        this.#getNeighborPoints(position).map(neighborPoint => new Node(neighborPoint))
 
     /**
      * Gets the neighboring points of a given point.
@@ -147,53 +157,37 @@ export default class Pathfinder {
      */
     #getNeighborPoints({ x, y, z }: Point3D): Point3D[] {
         const neighborPoints: Point3D[] = [
-            new Point3D(x - 1, y, z),         // Left
-            new Point3D(x + 1, y, z),         // Right
-            new Point3D(x, y - 1, z),         // Up
-            new Point3D(x, y + 1, z),         // Down
-            new Point3D(x - 1, y - 1, z),     // Upper-left
-            new Point3D(x + 1, y + 1, z),     // Lower-right
-            new Point3D(x - 1, y + 1, z),     // Lower-left
-            new Point3D(x + 1, y - 1, z),     // Upper-right
+            // Neighbors in the x and y dimensions with the same z position (current z position)
+            new Point3D(x - 1, y, z),
+            new Point3D(x + 1, y, z),
+            new Point3D(x, y - 1, z),
+            new Point3D(x, y + 1, z),
+
+            // Diagonal neighbors with the same z position (current z position)
+            new Point3D(x - 1, y - 1, z),
+            new Point3D(x + 1, y + 1, z),
+            new Point3D(x - 1, y + 1, z),
+            new Point3D(x + 1, y - 1, z),
         ]
 
-        return neighborPoints.filter((point) => this.#isValidTile(point))
+        return neighborPoints.filter(point => this.#isValidTile(point))
     }
 
     /**
      * Calculate the G cost (movement cost) between the current node's position
      * and a neighbor point.
-     *
-     * @param {Point3D} currentNodePosition - The position of the current node.
-     * @param {Point3D} neighborPoint - The position of the neighbor point.
+     * @param {Node} currentNode - The current node.
+     * @param {Node} neighborNode - The neighbor.
      * @returns {number} The G cost between the two positions.
      */
-    #calculateGCost(currentNodePosition: Point3D, neighborPoint: Point3D): number {
-        const delta = new Point3D(
-            Math.abs(currentNodePosition.x - neighborPoint.x),
-            Math.abs(currentNodePosition.y - neighborPoint.y),
-            Math.abs(currentNodePosition.z - neighborPoint.z)
+    #calculateGCost(currentNode: Node, neighborNode: Node): number {
+        const delta = new Point(
+            Math.abs(currentNode.position.x - neighborNode.position.x),
+            Math.abs(currentNode.position.y - neighborNode.position.y)
         )
 
-        const minimumDelta = Math.min(delta.x, delta.y, delta.z)
-
-        return minimumDelta > 0 ? this.#DIAGONAL_COST * minimumDelta :
-            this.#HORIZONTAL_VERTICAL_COST * minimumDelta
-    }
-
-    /**
-     * Calculates the heuristic cost (estimated cost) between two points.
-     * @param {Point3D} point - The current point.
-     * @param {Point3D} goalPoint - The goal point.
-     * @returns {number} - The heuristic cost between the points.
-     */
-    #calculateHeuristic(point: Point3D, goalPoint: Point3D): number {
-        const delta = new Point3D(
-            Math.abs(point.x - goalPoint.x),
-            Math.abs(point.y - goalPoint.y),
-            Math.abs(point.z - goalPoint.z)
-        )
-
-        return Math.hypot(delta.x, delta.y, delta.z)
+        return (delta.x + delta.y === 2) ?
+            this.#DIAGONAL_COST * neighborNode.gCost :
+            this.#HORIZONTAL_VERTICAL_COST * neighborNode.gCost
     }
 }

@@ -1,19 +1,17 @@
 import { Point, Polygon } from 'pixi.js'
 
-import Point3D from '../../utils/Point3D'
-
-import Pathfinder from '../../pathfinding/Pathfinder'
+import TileGraphics from './TileGraphics'
 
 import Avatar from '../avatar/Avatar'
 
-import TileGraphics from './TileGraphics'
+import Pathfinder from '../../pathfinding/Pathfinder'
 
-import { cartesianToIsometric, isometricToCartesian } from '../../utils/coordinateTransformations'
+import Point3D from '../../utils/Point3D'
+import { isometricToCartesian } from '../../utils/coordinateTransformations'
 
 import { TILE_GRID } from '../../constants/Tile.constants'
 
 import { TILE_SURFACE_POINTS } from '../../constants/Tile.constants'
-import { AVATAR_OFFSETS as AVATAR_OFFSETS } from '../../constants/Avatar.constants'
 
 /**
  * Represents a tile on a grid.
@@ -34,18 +32,18 @@ export default class Tile {
     readonly #graphics: TileGraphics
 
     /**
-     * The Pathfinder instance for pathfinding operations related to this tile.
-     * @type {Pathfinder}
-     * @private
-     */
-    #pathfinder!: Pathfinder
-
-    /**
      * The Avatar object representing the character in the scene.
      * @type {Avatar}
      * @private
      */
     #avatar!: Avatar
+
+    /**
+     * The Pathfinder instance for pathfinding operations related to this tile.
+     * @type {Pathfinder}
+     * @private
+     */
+    #pathfinder!: Pathfinder
 
     /**
      * Creates a new Tile instance.
@@ -67,9 +65,9 @@ export default class Tile {
      * @param {Avatar} avatar - The Avatar object representing the character in the scene.
      * @returns {this} The initialized Tile instance.
      */
-    initialize(pathfinder: Pathfinder, avatar: Avatar): this {
-        this.#pathfinder = pathfinder
+    initialize(avatar: Avatar, pathfinder: Pathfinder): this {
         this.#avatar = avatar
+        this.#pathfinder = pathfinder
 
         this.#setupEventListeners()
 
@@ -166,7 +164,9 @@ export default class Tile {
      */
     async #handleClick(): Promise<void> {
         if (!this.#avatar.currentTile) return
-        
+
+        console.log('clicked position: ', isometricToCartesian(this.position))
+
         const start = isometricToCartesian(this.#avatar.currentTile.position)
         const goal = isometricToCartesian(this.#position)
 
@@ -177,6 +177,8 @@ export default class Tile {
 
             return
         }
+
+        console.log(path)
 
         await this.#avatar.moveAlongPath(path)
     }

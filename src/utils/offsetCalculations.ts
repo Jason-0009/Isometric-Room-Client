@@ -8,7 +8,6 @@ import Point3D from './Point3D'
 
 /**
  * Calculate offsets for positioning a cube centered at a given point.
- *
  * @param {number} size - The size of the cube.
  * @returns {Point} The calculated cube offsets as a Point.
  */

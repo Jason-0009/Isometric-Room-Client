@@ -24,7 +24,7 @@ export default class Client {
    * Creates a new Client instance.
    */
   constructor() {
-    const applicationOptions: Partial<IApplicationOptions> = this.#getApplicationOptions()
+    const applicationOptions: Partial<IApplicationOptions> = this.#applicationOptions
 
     // Create the application instance
     this.#application = new Application(applicationOptions)
@@ -54,7 +54,7 @@ export default class Client {
    * @returns {Partial<IApplicationOptions>} The application options.
    * @private
    */
-  #getApplicationOptions(): Partial<IApplicationOptions> {
+  get #applicationOptions(): Partial<IApplicationOptions> {
     return {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -86,7 +86,7 @@ export default class Client {
   #handleWindowResize() {
     const { innerWidth, innerHeight } = window
 
-    // Resize the Pixi.js renderer
+    // Resize the renderer
     this.#application.renderer.resize(innerWidth, innerHeight)
 
     // Center the scene within the viewport

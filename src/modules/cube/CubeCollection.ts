@@ -1,15 +1,15 @@
 import { Container } from 'pixi.js'
 
-import Cube from './Cube'
-
-import Point3D from '../../utils/Point3D'
 import Camera from '../../core/Camera'
 
+import Cube from './Cube'
 import Tilemap from '../tile/Tilemap'
 
-import { CUBE_SETTINGS } from '../../constants/Cube.constants'
+import Point3D from '../../utils/Point3D'
 import { calculateCubeOffsets } from '../../utils/offsetCalculations'
 import { cartesianToIsometric } from '../../utils/coordinateTransformations'
+
+import { CUBE_SETTINGS } from '../../constants/Cube.constants'
 
 /**
  * A collection of cubes that can be managed and sorted.

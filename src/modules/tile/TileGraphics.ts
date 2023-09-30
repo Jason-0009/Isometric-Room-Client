@@ -15,7 +15,7 @@ export default class TileGraphics extends Graphics {
      * @type {TileHover | null}
      * @private
      */
-    #tileHover: TileHover | null = null;
+    #tileHover: TileHover | null = null
 
     /**
      * Create a new TileGraphics instance.
@@ -36,8 +36,9 @@ export default class TileGraphics extends Graphics {
      * Draw the tile and its borders.
      */
     #draw(hasLeftBorder: boolean, hasRightBorder: boolean): void {
-        this.#drawSurface() // Draw the tile surface.
-
+        // Draw the tile surface.
+        this.#drawSurface()
+        
         // Check and draw borders based on tile position.
         if (hasLeftBorder) this.#drawLeftBorder()
         if (hasRightBorder) this.#drawRightBorder()

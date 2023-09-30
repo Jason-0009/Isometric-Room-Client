@@ -2,7 +2,7 @@ import { Graphics } from 'pixi.js'
 
 import Point3D from '../../utils/Point3D'
 
-import { AVATAR_HEIGHT, AVATAR_WIDTH } from '../../constants/Avatar.constants'
+import { AVATAR_COLORS, AVATAR_DIMENSIONS } from '../../constants/Avatar.constants'
 
 /**
  * Represents the graphical representation of an avatar.
@@ -36,13 +36,13 @@ export default class AvatarGraphics extends Graphics {
      */
     #drawTopFace(): void {
         const points = [
-            0, -AVATAR_HEIGHT,
-            AVATAR_WIDTH, -AVATAR_HEIGHT - AVATAR_WIDTH / 2,
-            AVATAR_WIDTH * 2, -AVATAR_HEIGHT,
-            AVATAR_WIDTH, -AVATAR_HEIGHT + AVATAR_WIDTH / 2
+            0, -AVATAR_DIMENSIONS.HEIGHT,
+            AVATAR_DIMENSIONS.WIDTH, -AVATAR_DIMENSIONS.HEIGHT - AVATAR_DIMENSIONS.WIDTH / 2,
+            AVATAR_DIMENSIONS.WIDTH * 2, -AVATAR_DIMENSIONS.HEIGHT,
+            AVATAR_DIMENSIONS.WIDTH, -AVATAR_DIMENSIONS.HEIGHT + AVATAR_DIMENSIONS.WIDTH / 2
         ]
 
-        this.beginFill(0xfffff)
+        this.beginFill(AVATAR_COLORS.TOP)
 
         this.drawPolygon(points)
 
@@ -56,12 +56,12 @@ export default class AvatarGraphics extends Graphics {
     #drawLeftFace(): void {
         const points = [
             0, 0,
-            0, -AVATAR_HEIGHT,
-            AVATAR_WIDTH, -AVATAR_HEIGHT + AVATAR_WIDTH / 2,
-            AVATAR_WIDTH, AVATAR_WIDTH / 2,
+            0, -AVATAR_DIMENSIONS.HEIGHT,
+            AVATAR_DIMENSIONS.WIDTH, -AVATAR_DIMENSIONS.HEIGHT + AVATAR_DIMENSIONS.WIDTH / 2,
+            AVATAR_DIMENSIONS.WIDTH, AVATAR_DIMENSIONS.WIDTH / 2,
         ]
 
-        this.beginFill(0x38383)
+        this.beginFill(AVATAR_COLORS.LEFT_FACE)
 
         this.drawPolygon(points)
 
@@ -74,13 +74,13 @@ export default class AvatarGraphics extends Graphics {
      */
     #drawRightFace(): void {
         const points = [
-            AVATAR_WIDTH, AVATAR_WIDTH / 2,
-            AVATAR_WIDTH, -AVATAR_HEIGHT + AVATAR_WIDTH / 2,
-            AVATAR_WIDTH * 2, -AVATAR_HEIGHT,
-            AVATAR_WIDTH * 2, 0,
+            AVATAR_DIMENSIONS.WIDTH, AVATAR_DIMENSIONS.WIDTH / 2,
+            AVATAR_DIMENSIONS.WIDTH, -AVATAR_DIMENSIONS.HEIGHT + AVATAR_DIMENSIONS.WIDTH / 2,
+            AVATAR_DIMENSIONS.WIDTH * 2, -AVATAR_DIMENSIONS.HEIGHT,
+            AVATAR_DIMENSIONS.WIDTH * 2, 0,
         ]
 
-        this.beginFill(0xFFFFFF)
+        this.beginFill(AVATAR_COLORS.RIGHT_FACE)
 
         this.drawPolygon(points)
 

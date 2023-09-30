@@ -1,47 +1,4 @@
-/**
- * Represents dimensions for a tile.
- */
-type TileDimensions = {
-    /**
-     * The width of a tile.
-     */
-    WIDTH: number
-
-    /**
-     * The height of a tile.
-     */
-    HEIGHT: number
-
-    /**
-     * The thickness of a tile.
-     */
-    THICKNESS: number
-}
-
-/**
- * Represents colors for a tile.
- */
-type TileColors = {
-    /**
-     * The color of the tile's surface.
-     */
-    SURFACE: number
-
-    /**
-     * The color of the left border of the tile.
-     */
-    LEFT_BORDER: number
-
-    /**
-     * The color of the right border of the tile.
-     */
-    RIGHT_BORDER: number
-
-    /**
-     * The color of the tile when hovered over.
-     */
-    HOVER: number
-}
+import { TileDimensions, TileColors } from '../types/Tile.types'
 
 /**
  * Constants for tile dimensions.
@@ -108,7 +65,7 @@ export const TILE_SURFACE_POINTS: number[] = [
  * @type {(number | null)[][]}
  */
 export const TILE_GRID: number[][] = [
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [-1, -1, 0, 0, 0, 0],
+    [0, -1, 0, -1, 0, 0]
 ]

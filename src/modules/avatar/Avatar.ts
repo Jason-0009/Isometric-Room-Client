@@ -1,11 +1,12 @@
 import AvatarGraphics from './AvatarGraphics'
 
+import Tile from '../tile/Tile'
+import Tilemap from '../tile/Tilemap'
+
 import Point3D from '../../utils/Point3D'
 import { cartesianToIsometric } from '../../utils/coordinateTransformations'
 
-import { AVATAR_TILE_POINT, AVATAR_OFFSETS } from '../../constants/Avatar.constants'
-import Tile from '../tile/Tile'
-import Tilemap from '../tile/Tilemap'
+import { AVATAR_OFFSETS, AVATAR_SPEED } from '../../constants/Avatar.constants'
 
 /**
  * Represents an avatar in the isometric scene.
@@ -25,8 +26,20 @@ export default class Avatar {
      */
     readonly #graphics: AvatarGraphics
 
+    /**
+     * Represents the Tilemap associated with the avatar.
+     * The Tilemap manages the game's tiles and provides information about the game world.
+     * It is assigned during the initialization of the avatar using the `initialize` method.
+     * @type {Tilemap}
+     * @private
+     */
     #tilemap!: Tilemap
 
+    /**
+     * Represents the current Tile that the avatar is positioned on.
+     * @type {Tile | undefined}
+     * @private
+     */
     #currentTile!: Tile | undefined
 
     /**
@@ -34,21 +47,21 @@ export default class Avatar {
      * @type {Point3D | null}
      * @private
      */
-    #destination: Point3D | null = null;
+    #destination: Point3D | null = null
 
     /**
      * Flag to indicate if the avatar is currently moving.
      * @type {boolean}
      * @private
      */
-    #isMoving: boolean = false;
+    #isMoving: boolean = false
 
     /**
      * A callback function to call when the movement is complete.
      * @type {(() => void) | null}
      * @private
      */
-    #onMovementComplete: (() => void) | null = null;
+    #onMovementComplete: (() => void) | null = null
 
     /**
      * Creates a new Avatar instance.
@@ -60,6 +73,12 @@ export default class Avatar {
         this.#graphics = new AvatarGraphics(this.#position)
     }
 
+    /**
+     * Initializes the Avatar by setting up its associated Tilemap and current Tile.
+     * @param {Tilemap} tilemap - The Tilemap instance representing the game world.
+     * @param {Tile} currentTile - The Tile the avatar is initially positioned on.
+     * @returns {this} The initialized Avatar instance.
+     */
     initialize(tilemap: Tilemap, currentTile: Tile): this {
         this.#tilemap = tilemap
         this.#currentTile = currentTile
@@ -68,72 +87,27 @@ export default class Avatar {
     }
 
     /**
-     * Move the avatar to a destination.
-     * @param {Point3D} position - The destination to move the avatar to.
-     * @returns {Promise<void>} A promise that resolves when the movement is complete.
-     */
-    async moveTo(position: Point3D): Promise<void> {
-        if (this.#isMoving) {
-            this.#abortMovement()
-        }
-
-        this.#destination = position
-        this.#isMoving = true
-
-        return new Promise<void>((resolve) => {
-            this.#onMovementComplete = resolve
-        })
-    }
-
-    /**
-     * Abort the current movement and reset movement-related properties.
-     * @private
-     */
-    #abortMovement(): void {
-        this.#isMoving = false
-        this.#destination = null
-        this.#onMovementComplete = null
-    }
-
-    /**
-     * Set the avatar's position and update its graphics.
-     * @param {Point3D} position - The new position for the avatar.
-     * @private
-     */
-    #setPosition(position: Point3D): void {
-        this.#position.copyFrom(position)
-        this.#graphics.position.copyFrom(position)
-    }
-
-    /**
      * Move the avatar along a path of destinations.
      * @param {Point3D[]} path - The path of destinations to move the avatar along.
      * @returns {Promise<void>} A promise that resolves when the movement along the path is complete.
      */
     async moveAlongPath(path: Point3D[]): Promise<void> {
-        if (this.#isMoving) {
-            this.#abortMovement()
-            return
+        for (const tilePoint of path) {
+            await this.moveTo(tilePoint)
         }
+    }
 
-        const moveNext = async () => {
-            if (path.length === 0) {
-                return
-            }
+    async moveTo(tilePoint: Point3D): Promise<void> {
+        const tilePosition = cartesianToIsometric(tilePoint)
 
-            const tilePoint = path.shift()!
+        this.#currentTile = this.#tilemap!.findTileByExactPosition(tilePosition)
 
-            const tilePosition = cartesianToIsometric(tilePoint)
+        this.#destination = tilePosition.add(AVATAR_OFFSETS)
+        this.#isMoving = true
 
-            this.#currentTile = this.#tilemap.findTileByExactPosition(tilePosition)
-
-            const position = tilePosition.add(AVATAR_OFFSETS)
-
-            await this.moveTo(position)
-            await moveNext()
-        }
-
-        await moveNext()
+        await new Promise<void>((resolve) => {
+            this.#onMovementComplete = resolve
+        })
     }
 
     /**
@@ -142,13 +116,12 @@ export default class Avatar {
      */
     update(delta: number) {
         if (this.#isMoving && this.#destination) {
-            const step = 1 * delta
             const direction = this.#destination.subtract(this.#position).normalize()
-            const newPosition = this.#position.add(direction.scale(step))
+            const step = AVATAR_SPEED * delta
 
+            // Ensure the avatar reaches exactly the destination
             if (this.#position.distanceTo(this.#destination) <= step) {
-                this.#setPosition(this.#destination)
-
+                this.#updatePosition(this.#destination)
                 this.#isMoving = false
                 this.#destination = null
 
@@ -157,9 +130,21 @@ export default class Avatar {
                     this.#onMovementComplete = null
                 }
             } else {
-                this.#setPosition(newPosition)
+                const newPosition = this.#position.add(direction.scale(step))
+                this.#updatePosition(newPosition)
             }
         }
+    }
+
+    /**
+     * Update the avatar's position and its graphics.
+     * @param {Point3D} position - The new position for the avatar.
+     * @private
+     */
+    #updatePosition(position: Point3D): void {
+        this.#position.copyFrom(position)
+
+        this.#graphics.position.copyFrom(this.#position)
     }
 
     /**
@@ -178,6 +163,10 @@ export default class Avatar {
         return this.#position
     }
 
+    /**
+     * Get the current Tile that the avatar is positioned on.
+     * @type {Tile | undefined}
+     */
     get currentTile(): Tile | undefined {
         return this.#currentTile
     }

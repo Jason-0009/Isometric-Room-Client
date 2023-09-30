@@ -3,11 +3,11 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-    mode: 'development', // Set to 'production' for production builds
+    mode: 'development',
 
     devtool: 'source-map',
 
-    entry: './src/index.ts', // Adjust the entry point as needed
+    entry: './src/index.ts',
 
     output: {
         filename: 'bundle.js',
