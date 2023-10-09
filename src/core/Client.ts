@@ -1,6 +1,6 @@
 import { Application, IApplicationOptions } from 'pixi.js'
 
-import Scene from './Scene'
+import Scene from '@core/Scene'
 
 /**
  * Represents the client application for rendering a scene.
@@ -8,15 +8,15 @@ import Scene from './Scene'
 export default class Client {
   /**
    * The application instance.
+   * 
    * @type {Application}
-   * @private
    */
   readonly #application: Application
 
   /**
   * The main scene instance for managing and rendering scenes.
+  * 
   * @type {Scene}
-  * @private
   */
   readonly #scene: Scene
 
@@ -26,33 +26,19 @@ export default class Client {
   constructor() {
     const applicationOptions: Partial<IApplicationOptions> = this.#applicationOptions
 
-    // Create the application instance
     this.#application = new Application(applicationOptions)
 
-    // Append the view to the DOM
     this.#appendViewToDOM()
 
-    // Initialize the scene
     this.#scene = new Scene(this.#application)
-  }
 
-  /**
-   * Initializes the client application, including the scene and event listeners.
-   * @returns {this} The Client instance for method chaining.
-   */
-  initialize(): this {
-    this.#scene.initialize()
-
-    // Set up event listeners
     this.#setupEventListeners()
-
-    return this
   }
 
   /**
    * Retrieves the configuration options for the application.
+   * 
    * @returns {Partial<IApplicationOptions>} The application options.
-   * @private
    */
   get #applicationOptions(): Partial<IApplicationOptions> {
     return {
@@ -61,35 +47,30 @@ export default class Client {
       backgroundColor: 0x000000,
       antialias: true,
       resolution: window.devicePixelRatio || 1,
-      autoDensity: true,
+      autoDensity: true
     }
   }
 
   /**
-   * Appends the Pixi.js view (canvas) to the DOM.
-   * @private
+   * Appends the view (canvas) to the DOM.
    */
   #appendViewToDOM = () =>
     document.body.appendChild(this.#application.view as HTMLCanvasElement)
 
   /**
    * Sets up event listeners, e.g., for window resize events.
-   * @private
    */
   #setupEventListeners = () =>
     window.addEventListener('resize', this.#handleWindowResize.bind(this))
 
   /**
    * Handles the window resize event by updating the renderer and centering the scene.
-   * @private
    */
   #handleWindowResize() {
     const { innerWidth, innerHeight } = window
 
-    // Resize the renderer
     this.#application.renderer.resize(innerWidth, innerHeight)
 
-    // Center the scene within the viewport
     this.#scene.centerStage()
   }
 }

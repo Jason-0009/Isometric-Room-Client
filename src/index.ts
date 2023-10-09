@@ -1,5 +1,5 @@
 import './index.css'
 
-import Client from './core/Client'
+import Client from '@core/Client'
 
-new Client().initialize()
+new Client()

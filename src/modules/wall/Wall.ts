@@ -1,12 +1,12 @@
 import { Graphics } from 'pixi.js'
 
-import WallDirection from './WallDirection'
+import WallDirection from '@modules/wall/WallDirection'
 
-import Point3D from '../../utils/Point3D'
+import Point3D from '@utils/Point3D'
 
-import { WALL_COLORS, WALL_DIMENSIONS } from '../../constants/Wall.constants'
+import { WALL_COLORS, WALL_DIMENSIONS } from '@constants/Wall.constants'
 
-import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
+import { TILE_DIMENSIONS } from '@constants/Tile.constants'
 
 /**
  * Represents a graphical representation of a wall.
@@ -14,6 +14,7 @@ import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
 export default class Wall extends Graphics {
     /**
      * Create a new Wall instance.
+     * 
      * @param {Point3D} position - The position of the wall.
      * @param {WallDirection} direction - The direction of the wall.
      */
@@ -27,12 +28,12 @@ export default class Wall extends Graphics {
 
     /**
      * Draw the wall graphics.
+     * 
      * @param {WallDirection} direction - The direction of the wall.
      */
     #draw(direction: WallDirection): void {
         switch (direction) {
             case WallDirection.BOTH:
-                // Draw both left and right walls
                 this.#drawLeft()
                 this.#drawRight()
 
@@ -47,15 +48,11 @@ export default class Wall extends Graphics {
                 this.#drawRight()
 
                 break
-
-            default:
-                console.error(`Invalid direction: ${direction}`)
         }
     }
 
     /**
      * Draw the left side of the wall.
-     * @private
      */
     #drawLeft(): void {
         this.#drawLeftSurface()
@@ -65,7 +62,6 @@ export default class Wall extends Graphics {
 
     /**
      * Draw the right side of the wall.
-     * @private
      */
     #drawRight(): void {
         this.#drawRightSurface()
@@ -75,7 +71,6 @@ export default class Wall extends Graphics {
 
     /**
      * Draw the left surface of the wall.
-     * @private
      */
     #drawLeftSurface(): void {
         this.beginFill(WALL_COLORS.LEFT.SURFACE)
@@ -88,13 +83,11 @@ export default class Wall extends Graphics {
         ]
 
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draw the left border of the wall.
-     * @private
      */
     #drawLeftBorder(): void {
         this.beginFill(WALL_COLORS.LEFT.BORDER)
@@ -111,13 +104,11 @@ export default class Wall extends Graphics {
         ]
 
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draw the top-left border of the wall.
-     * @private
      */
     #drawTopLeftBorder(): void {
         this.beginFill(WALL_COLORS.LEFT.BORDER_TOP)
@@ -135,13 +126,11 @@ export default class Wall extends Graphics {
         ]
 
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draw the right surface of the wall.
-     * @private
      */
     #drawRightSurface(): void {
         this.beginFill(WALL_COLORS.RIGHT.SURFACE)
@@ -154,13 +143,11 @@ export default class Wall extends Graphics {
         ]
 
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draw the right border of the wall.
-     * @private
      */
     #drawRightBorder(): void {
         this.beginFill(WALL_COLORS.RIGHT.BORDER)
@@ -180,13 +167,11 @@ export default class Wall extends Graphics {
         ]
 
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draw the top-right border of the wall.
-     * @private
      */
     #drawTopRightBorder(): void {
         this.beginFill(WALL_COLORS.RIGHT.BORDER_TOP)
@@ -204,7 +189,6 @@ export default class Wall extends Graphics {
         ]
 
         this.drawPolygon(points)
-
         this.endFill()
     }
 }

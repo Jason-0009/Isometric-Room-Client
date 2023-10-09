@@ -6,19 +6,16 @@ import { Point } from 'pixi.js'
 export default class Point3D {
     /**
      * The x-coordinate of the point.
-     * @private
      */
     #x: number
 
     /**
      * The y-coordinate of the point.
-     * @private
      */
     #y: number
 
     /**
      * The z-coordinate of the point.
-     * @private
      */
     #z: number
 
@@ -40,9 +37,9 @@ export default class Point3D {
      * @returns {void}
      */
     copyFrom(point: Point3D): void {
-        this.#x = point.#x
-        this.#y = point.#y
-        this.#z = point.#z
+        this.#x = point.x
+        this.#y = point.y
+        this.#z = point.z
     }
 
     /**
@@ -51,13 +48,13 @@ export default class Point3D {
      * @returns {boolean} True if the points are equal, false otherwise.
      */
     equals = (point: Point3D): boolean =>
-        this.#x === point.#x && this.#y === point.#y && this.#z === point.#z
+        this.#x === point.x && this.#y === point.y && this.#z === point.z
 
     /**
-     * Adds another Point3D to the current one and returns a new Point3D.
-     * @param {Point3D | Point} point - The other Point3D to add.
-     * @returns {Point3D} A new Point3D resulting from the addition.
-     */
+      * Adds another Point3D to the current one and returns a new Point3D.
+      * @param {Point3D | Point} point - The other Point3D to add.
+      * @returns {Point3D} A new Point3D resulting from the addition.
+      */
     add = (point: Point3D | Point): Point3D =>
         new Point3D(
             this.#x + point.x,
@@ -67,6 +64,7 @@ export default class Point3D {
 
     /**
      * Subtracts another Point3D from the current one and returns a new Point3D.
+     * 
      * @param {Point3D | Point} point - The other Point3D to subtract.
      * @returns {Point3D} A new Point3D resulting from the subtraction.
      */
@@ -79,6 +77,7 @@ export default class Point3D {
 
     /**
      * Calculate the distance between two Point3D instances.
+     * 
      * @param {Point3D} point - The other Point3D.
      * @returns {number} The distance between the two points.
      */
@@ -89,33 +88,34 @@ export default class Point3D {
             this.#z - point.z
         )
 
-        return Math.hypot(delta.x, delta.y, delta.x)
+        return Math.hypot(delta.x, delta.y, delta.z)
     }
 
     /**
      * Normalize the current Point3D.
+     * 
      * @returns {Point3D} A new Point3D with a magnitude of 1 and the same direction.
      */
-    normalize(): Point3D {
-        const magnitude = Math.hypot(this.x, this.y, this.z)
-
-        // console.log(magnitude)
-
-        return magnitude === 0 ? new Point3D(0, 0, 0) :
-            new Point3D(this.x / magnitude, this.y / magnitude, this.z / magnitude)
-    }
+    normalize = (): Point3D =>
+        this.magnitude === 0 ? new Point3D(0, 0, 0) :
+            new Point3D(
+                this.#x / this.magnitude,
+                this.#y / this.magnitude,
+                this.#z / this.magnitude
+            )
 
     /**
      * Scale the current Point3D by a factor.
+     * 
      * @param {number} factor - The scaling factor.
      * @returns {Point3D} A new Point3D scaled by the factor.
      */
     scale = (factor: number): Point3D =>
         new Point3D(this.x * factor, this.y * factor, this.z * factor)
 
-
     /**
      * Gets the x-coordinate of the point.
+     * 
      * @returns {number} The x-coordinate.
      */
     get x(): number {
@@ -124,6 +124,7 @@ export default class Point3D {
 
     /**
      * Gets the y-coordinate of the point.
+     * 
      * @returns {number} The y-coordinate.
      */
     get y(): number {
@@ -132,6 +133,7 @@ export default class Point3D {
 
     /**
      * Gets the z-coordinate of the point.
+     * 
      * @returns {number} The z-coordinate.
      */
     get z(): number {
@@ -139,26 +141,20 @@ export default class Point3D {
     }
 
     /**
-     * Sets the x-coordinate of the point.
-     * @param {number} x - The new x-coordinate.
-     */
-    set x(x: number) {
-        this.#x = x
-    }
-
-    /**
-     * Sets the y-coordinate of the point.
-     * @param {number} y - The new y-coordinate.
-     */
-    set y(y: number) {
-        this.#y = y
-    }
-
-    /**
      * Sets the z-coordinate of the point.
-     * @param {number} z - The new z-coordinate.
+     * 
+     * @param {number} value - The new z-coordinate value.
      */
-    set z(z: number) {
-        this.#z = z
+    set z(value: number) {
+        this.#z = value
+    }
+
+    /**
+     * Gets the magnitude (length) of the vector.
+     * 
+     * @returns {number} The magnitude of the vector.
+     */
+    get magnitude(): number {
+        return Math.hypot(this.#x, this.#y, this.#z)
     }
 }

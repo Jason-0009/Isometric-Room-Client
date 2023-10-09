@@ -1,8 +1,8 @@
 import { Graphics } from 'pixi.js'
 
-import Point3D from '../../utils/Point3D'
+import Point3D from '@utils/Point3D'
 
-import { AVATAR_COLORS, AVATAR_DIMENSIONS } from '../../constants/Avatar.constants'
+import { AVATAR_COLORS, AVATAR_DIMENSIONS } from '@constants/Avatar.constants'
 
 /**
  * Represents the graphical representation of an avatar.
@@ -10,12 +10,12 @@ import { AVATAR_COLORS, AVATAR_DIMENSIONS } from '../../constants/Avatar.constan
 export default class AvatarGraphics extends Graphics {
     /**
      * Creates a new instance of AvatarGraphics.
+     * 
      * @param {Point3D} position - The initial position of the avatar.
      */
     constructor(position: Point3D) {
         super()
 
-        // Set the initial position of the avatar within the graphics.
         this.position.set(position.x, position.y - position.z)
 
         this.#draw()
@@ -32,7 +32,6 @@ export default class AvatarGraphics extends Graphics {
 
     /**
      * Draws the top face of the avatar.
-     * @private
      */
     #drawTopFace(): void {
         const points = [
@@ -43,15 +42,12 @@ export default class AvatarGraphics extends Graphics {
         ]
 
         this.beginFill(AVATAR_COLORS.TOP)
-
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draws the left face of the avatar.
-     * @private
      */
     #drawLeftFace(): void {
         const points = [
@@ -62,15 +58,12 @@ export default class AvatarGraphics extends Graphics {
         ]
 
         this.beginFill(AVATAR_COLORS.LEFT_FACE)
-
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draws the right face of the avatar.
-     * @private
      */
     #drawRightFace(): void {
         const points = [
@@ -81,9 +74,7 @@ export default class AvatarGraphics extends Graphics {
         ]
 
         this.beginFill(AVATAR_COLORS.RIGHT_FACE)
-
         this.drawPolygon(points)
-
         this.endFill()
     }
 }

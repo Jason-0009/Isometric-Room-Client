@@ -5,6 +5,14 @@
         "allowSyntheticDefaultImports": true,
         "module": "CommonJS",
         "outDir": "./dist",
-        "strict": true
+        "strict": true,
+        "baseUrl": "./src",
+        "paths": {
+            "@constants/*": ["constants/*"],
+            "@core/*": ["core/*"],
+            "@modules/*": ["modules/*"],
+            "@pathfinding/*": ["pathfinding/*"],
+            "@utils/*": ["utils/*"]
+        }
     }
 }

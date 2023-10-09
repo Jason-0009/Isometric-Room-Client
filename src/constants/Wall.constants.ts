@@ -8,12 +8,14 @@ import { WallDimensions, WallColors } from '../types/Wall.types'
 export const WALL_DIMENSIONS: WallDimensions = {
     /**
      * The height of the wall.
+     * 
      * @type {number}
      */
     HEIGHT: 100,
 
     /**
      * The thickness of the wall.
+     * 
      * @type {number}
      */
     THICKNESS: 5,
@@ -27,6 +29,7 @@ export const WALL_DIMENSIONS: WallDimensions = {
 export const WALL_COLORS: WallColors = {
     /**
      * Colors for the left side of the wall.
+     * 
      * @type {object}
      * @property {number} SURFACE - The color of the left wall surface (Amber).
      * @property {number} BORDER - The color of the left wall border (Deep Orange).
@@ -40,6 +43,7 @@ export const WALL_COLORS: WallColors = {
 
     /**
      * Colors for the right side of the wall.
+     * 
      * @type {object}
      * @property {number} SURFACE - The color of the right wall surface (Green).
      * @property {number} BORDER - The color of the right wall border (Teal).

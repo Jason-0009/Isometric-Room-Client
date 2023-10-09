@@ -1,74 +1,74 @@
-import Point3D from '../utils/Point3D'
+import Point3D from '@utils/Point3D'
 
 /**
  * Represents a node in a pathfinding algorithm.
+ *
+ * A node has a position in 3D space, a cost from the start node to this node (gCost),
+ * a heuristic (estimated) cost from this node to the goal node (hCost), and a total cost
+ * (fCost), which is the sum of gCost and hCost.
+ *
+ * A node also has a parent node for tracing the path.
  */
 export default class Node {
     /**
      * The position of the node in 3D space.
+     * 
      * @type {Point3D}
-     * @private
      */
     readonly #position: Point3D
 
     /**
-     * Cost from the start node to this node (g).
+     * Cost from the start node to this node.
+     * 
      * @type {number}
-     * @private
      */
-    #gCost: number
+    #gCost: number = 0
 
     /**
-     * Heuristic (estimated) cost from this node to the goal node (h).
+     * Heuristic (estimated) cost from this node to the goal node.
+     * 
      * @type {number}
-     * @private
      */
-    #hCost: number
+    #hCost: number = 0
 
     /**
-     * Total cost of the node, which is the sum of gCost and hCost (fCost).
+     * Total cost of the node, which is the sum of gCost and hCost.
+     * 
      * @type {number}
-     * @private
      */
-    #fCost: number
+    #fCost: number = 0
 
     /**
      * Parent node for tracing the path.
+     * 
      * @type {Node | null}
-     * @private
      */
-    #parent: Node | null
+    #parent: Node | null = null
+
+    /**
+     * Height of the node in 3D space.
+     * 
+     * @type {number}
+     */
+    #height: number = 0
 
     /**
      * Creates a new Node instance.
+     *
      * @param {Point3D} position - The position of the node in 3D space.
-     * @param {number} gCost - The cost from the start node to this node (gCost).
-     * @param {number} hCost - The heuristic (estimated) cost from this node to the goal node (hCost).
      */
-    constructor(position: Point3D, gCost: number = 0,
-        hCost: number = 0, parent: Node | null = null) {
+    constructor(position: Point3D) {
         this.#position = position
-
-        this.#gCost = gCost
-        this.#hCost = hCost
-        this.#fCost = gCost + hCost
-
-        this.#parent = parent
     }
 
     /**
-     * Check if this node is equal to another node.
-     * @param {Node} node - The other node to compare.
-     * @returns {boolean} - True if the nodes are equal, false otherwise.
-     */
-    equals = (node: Node): boolean =>
-        this.#position.equals(node.position) &&
-        this.#gCost === node.gCost &&
-        this.#hCost === node.hCost &&
-        this.#fCost === node.fCost
+     * Updates the fCost value of the node to the sum of its gCost and hCost values.
+    */
+    updateFCost = (): number => this.#fCost = this.#gCost + this.#hCost
 
     /**
      * Get the position of the node.
+     *
      * @type {Point3D}
      * @returns {Point3D} - The position of the node.
      */
@@ -77,7 +77,8 @@ export default class Node {
     }
 
     /**
-     * Get the cost from the start node to this node (gCost).
+     * Get the cost from the start node to this node.
+     *
      * @type {number}
      * @returns {number} - The cost from the start node to this node.
      */
@@ -86,15 +87,17 @@ export default class Node {
     }
 
     /**
-     * Set the cost from the start node to this node (gCost).
-     * @param {number} value - The cost from the start node to this node.
+     * Set the cost from the start node to this node.
+     *
+     * @param {number} value - The new cost from the start node to this node.
      */
     set gCost(value: number) {
         this.#gCost = value
     }
 
     /**
-     * Get the heuristic cost from this node to the goal node (hCost).
+     * Get the heuristic cost from this node to the goal node.
+     *
      * @type {number}
      * @returns {number} - The heuristic cost from this node to the goal node.
      */
@@ -103,15 +106,17 @@ export default class Node {
     }
 
     /**
-     * Set the heuristic cost from this node to the goal node (hCost).
-     * @param {number} value - The heuristic cost from this node to the goal node.
+     * Set the heuristic cost from this node to the goal node.
+     *
+     * @param {number} value - The new heuristic cost from this node to the goal node.
      */
-    set hCost(value: number) {
+    set fCost(value: number) {
         this.#hCost = value
     }
 
     /**
-     * Get the total cost of the node (fCost).
+     * Get the total cost of the node.
+     *
      * @type {number}
      * @returns {number} - The total cost of the node.
      */
@@ -120,15 +125,8 @@ export default class Node {
     }
 
     /**
-     * Set the total cost of the node (fCost).
-     * @param {number} value - The total cost of the node.
-     */
-    set fCost(value: number) {
-        this.#fCost = value
-    }
-
-    /**
      * Get the parent node for tracing the path.
+     *
      * @type {Node | null}
      * @returns {Node | null} - The parent node of this node.
      */
@@ -138,9 +136,29 @@ export default class Node {
 
     /**
      * Set the parent node for tracing the path.
-     * @param {number} value - The parent node of this node.
+     *
+     * @param {Node | null} value - The new parent node of this node.
      */
-    set parent(value: Node) {
+    set parent(value: Node | null) {
         this.#parent = value
+    }
+
+    /**
+     * Get the height of the node.
+     *
+     * @type {number}
+     * @returns {number} - The height of the node.
+     */
+    get height(): number {
+        return this.#height
+    }
+
+    /**
+     * Set the height of the node.
+     *
+     * @param {number} value - The new height of the node.
+     */
+    set height(value: number) {
+        this.#height = value
     }
 }

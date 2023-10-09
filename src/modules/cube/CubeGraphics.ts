@@ -1,8 +1,8 @@
 import { Graphics } from 'pixi.js'
 
-import Point3D from '../../utils/Point3D'
+import Point3D from '@utils/Point3D'
 
-import { CUBE_COLORS } from '../../constants/Cube.constants'
+import { CUBE_COLORS } from '@constants/Cube.constants'
 
 /**
  * Represents the graphics of a cube in the isometric scene.
@@ -10,13 +10,14 @@ import { CUBE_COLORS } from '../../constants/Cube.constants'
 export default class CubeGraphics extends Graphics {
     /**
      * The size of the cube.
-     * @private
+
      * @type {number}
      */
     readonly #size: number
 
     /**
      * Creates a new CubeGraphics instance.
+     * 
      * @param {Point3D} position - The position of the cube in 3D space.
      * @param {number} size - The size of the cube.
      */
@@ -24,11 +25,7 @@ export default class CubeGraphics extends Graphics {
         super()
 
         this.position.set(position.x, position.y - position.z)
-
         this.#size = size
-
-        this.eventMode = 'dynamic'
-
         this.cursor = 'pointer'
 
         this.#draw()
@@ -36,7 +33,6 @@ export default class CubeGraphics extends Graphics {
 
     /**
      * Draws the cube by calling individual methods to draw its faces.
-     * @private
      */
     #draw(): void {
         this.#drawTopFace()
@@ -46,7 +42,6 @@ export default class CubeGraphics extends Graphics {
 
     /**
      * Draws the top face of the cube.
-     * @private
      */
     #drawTopFace(): void {
         const points = [
@@ -57,15 +52,12 @@ export default class CubeGraphics extends Graphics {
         ]
 
         this.beginFill(CUBE_COLORS.TOP_FACE)
-
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draws the left face of the cube.
-     * @private
      */
     #drawLeftFace(): void {
         const points = [
@@ -76,15 +68,12 @@ export default class CubeGraphics extends Graphics {
         ]
 
         this.beginFill(CUBE_COLORS.LEFT_FACE)
-
         this.drawPolygon(points)
-
         this.endFill()
     }
 
     /**
      * Draws the right face of the cube.
-     * @private
      */
     #drawRightFace(): void {
         const points = [
@@ -95,9 +84,7 @@ export default class CubeGraphics extends Graphics {
         ]
 
         this.beginFill(CUBE_COLORS.RIGHT_FACE)
-
         this.drawPolygon(points)
-
         this.endFill()
     }
 }

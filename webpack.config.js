@@ -16,6 +16,13 @@ module.exports = {
 
     resolve: {
         extensions: ['.ts', '.js'],
+        alias: {
+            "@constants": path.resolve(__dirname, 'src/constants'),
+            "@core": path.resolve(__dirname, 'src/core'),
+            "@modules": path.resolve(__dirname, 'src/modules'),
+            "@pathfinding": path.resolve(__dirname, 'src/pathfinding'),
+            "@utils": path.resolve(__dirname, 'src/utils')
+        }
     },
 
     module: {

@@ -2,6 +2,7 @@ import { TileDimensions, TileColors } from '../types/Tile.types'
 
 /**
  * Constants for tile dimensions.
+ * 
  * @type {TileDimensions}
  */
 export const TILE_DIMENSIONS: TileDimensions = {
@@ -23,6 +24,7 @@ export const TILE_DIMENSIONS: TileDimensions = {
 
 /**
  * Constants for tile colors.
+ * 
  * @type {TileColors}
  */
 export const TILE_COLORS: TileColors = {
@@ -50,6 +52,7 @@ export const TILE_COLORS: TileColors = {
 /**
  * Points defining the shape of a tile's surface (used for drawing).
  * The points are defined as [x1, y1, x2, y2, x3, y3, ...]
+ * 
  * @type {number[]}
  */
 export const TILE_SURFACE_POINTS: number[] = [
@@ -62,10 +65,14 @@ export const TILE_SURFACE_POINTS: number[] = [
 /**
  * Grid configuration representing whether to add a tile at each grid cell.
  * Each cell can have a height value (number) or be empty (null).
+ * 
  * @type {(number | null)[][]}
  */
 export const TILE_GRID: number[][] = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [-1, -1, 0, 0, 0, 0],
-    [0, -1, 0, -1, 0, 0]
+    [3, 1, 1, -1, 0],
+    [1, -1, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [-1, -1, 0, 0, 0, 0, 0],
+    [-1, -1, -1, -1, 0, 0, 0]
 ]

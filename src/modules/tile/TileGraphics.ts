@@ -1,10 +1,10 @@
 import { Graphics } from 'pixi.js'
 
-import TileHover from './TileHover'
+import TileHover from '@modules/tile/TileHover'
 
-import Point3D from '../../utils/Point3D'
+import Point3D from '@utils/Point3D'
 
-import { TILE_COLORS, TILE_DIMENSIONS } from '../../constants/Tile.constants'
+import { TILE_COLORS, TILE_DIMENSIONS } from '@constants/Tile.constants'
 
 /**
  * A class representing the graphical representation of a tile.
@@ -12,34 +12,36 @@ import { TILE_COLORS, TILE_DIMENSIONS } from '../../constants/Tile.constants'
 export default class TileGraphics extends Graphics {
     /**
      * Stores the hover effect for the tile.
+     * 
      * @type {TileHover | null}
-     * @private
      */
     #tileHover: TileHover | null = null
 
     /**
      * Create a new TileGraphics instance.
+     *
      * @param position - The position of the tile.
+     * @param hasLeftBorder - Whether the tile has a left border.
+     * @param hasRightBorder - Whether the tile has a right border.
      */
     constructor(position: Point3D, hasLeftBorder: boolean, hasRightBorder: boolean) {
         super()
 
         this.position.set(position.x, position.y - position.z)
-
         this.eventMode = 'static'
 
-        // Call the initial drawing method.
         this.#draw(hasLeftBorder, hasRightBorder)
     }
 
+
     /**
      * Draw the tile and its borders.
+     * 
+     * #private
      */
     #draw(hasLeftBorder: boolean, hasRightBorder: boolean): void {
-        // Draw the tile surface.
         this.#drawSurface()
-        
-        // Check and draw borders based on tile position.
+
         if (hasLeftBorder) this.#drawLeftBorder()
         if (hasRightBorder) this.#drawRightBorder()
     }
@@ -55,13 +57,8 @@ export default class TileGraphics extends Graphics {
             0, TILE_DIMENSIONS.HEIGHT / 2,
         ]
 
-        // Set the fill color.
         this.beginFill(TILE_COLORS.SURFACE)
-
-        // Draw the tile surface polygon.
         this.drawPolygon(points)
-
-        // End the fill.
         this.endFill()
     }
 
@@ -76,13 +73,8 @@ export default class TileGraphics extends Graphics {
             0, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
         ]
 
-        // Set border color.
         this.beginFill(TILE_COLORS.LEFT_BORDER)
-
-        // Draw the left border.
         this.drawPolygon(points)
-
-        // End the fill.
         this.endFill()
     }
 
@@ -97,13 +89,8 @@ export default class TileGraphics extends Graphics {
             TILE_DIMENSIONS.WIDTH, TILE_DIMENSIONS.HEIGHT / 2 + TILE_DIMENSIONS.THICKNESS,
         ]
 
-        // Set border color.
         this.beginFill(TILE_COLORS.RIGHT_BORDER)
-
-        // Draw the right border.
         this.drawPolygon(points)
-
-        // End the fill.
         this.endFill()
     }
 
@@ -113,10 +100,8 @@ export default class TileGraphics extends Graphics {
     createHoverEffect(): void {
         if (this.#tileHover) return
 
-        // Create a hover effect.
         this.#tileHover = new TileHover(this.position)
 
-        // Add the hover effect to the parent container.
         this.parent.addChild(this.#tileHover)
     }
 
@@ -126,13 +111,9 @@ export default class TileGraphics extends Graphics {
     destroyHoverEffect(): void {
         if (!this.#tileHover) return
 
-        // Remove the hover effect from the parent container.
         this.parent.removeChild(this.#tileHover)
 
-        // Destroy the hover effect instance.
         this.#tileHover.destroy()
-
-        // Reset the hover effect reference.
         this.#tileHover = null
     }
 }

@@ -1,17 +1,17 @@
 import { FederatedPointerEvent } from 'pixi.js'
 
-import Camera from '../../core/Camera'
+import Camera from '@core/Camera'
 
-import Tilemap from '../tile/Tilemap'
-import Tile from '../tile/Tile'
+import Tilemap from '@modules/tile/Tilemap'
+import Tile from '@modules/tile/Tile'
 
-import CubeCollection from './CubeCollection'
-import CubeGraphics from './CubeGraphics'
+import Avatar from '@modules/avatar/Avatar'
 
-import Point3D from '../../utils/Point3D'
-import { calculateCubeOffsets, calculateStackingOffsets } from '../../utils/offsetCalculations'
+import CubeCollection from '@modules/cube/CubeCollection'
+import CubeGraphics from '@modules/cube/CubeGraphics'
 
-import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
+import Point3D from '@utils/Point3D'
+import calculateCubeOffsets from '@utils/calculateCubeOffsets'
 
 /**
  * Represents a cube object with interactivity and positioning.
@@ -19,96 +19,99 @@ import { TILE_DIMENSIONS } from '../../constants/Tile.constants'
 export default class Cube {
     /**
      * The 3D position of the cube.
+     * 
      * @type {Point3D}
-     * @private
      */
     readonly #position: Point3D
 
     /**
      * The size of the cube.
+     * 
      * @type {number}
-     * @private
      */
     readonly #size: number
 
     /**
-     * The graphics object representing the cube.
-     * @type {CubeGraphics}
-     * @private
-     */
-    readonly #graphics: CubeGraphics
-
-    /**
-     * The camera object for controlling the view.
-     * @private
-     * @type {Camera}
-     */
-    #camera!: Camera
-
-    /**
-     * The tilemap where the cube exists.
-     * @type {Tilemap}
-     * @private
-     */
-    #tilemap!: Tilemap
-
-    /**
-     * The repository managing cubes.
-     * @type {CubeCollection}
-     * @private
-     */
-    #cubeCollection!: CubeCollection
-
-    /**
      * The current tile the cube is on.
+     * 
      * @type {Tile | undefined}
-     * @private
      */
     #currentTile: Tile | undefined
 
     /**
+     * The graphics object representing the cube.
+     * 
+     * @type {CubeGraphics}
+     */
+    readonly #graphics: CubeGraphics
+
+    /**
+     * The collection managing cubes.
+     * 
+     * @type {CubeCollection}
+     */
+    readonly #cubeCollection: CubeCollection
+
+    /**
+     * The camera object for controlling the view.
+     * 
+     * @type {Camera}
+     */
+    readonly #camera: Camera
+
+    /**
+     * The tilemap where the cube exists.
+     * 
+     * @type {Tilemap}
+     */
+    readonly #tilemap: Tilemap
+
+    /**
+     * The avatar object associated with this cube.
+     * 
+     * @type {Avatar}
+     */
+    readonly #avatar: Avatar
+
+    /**
      * A flag indicating whether the cube is being dragged.
+     * 
      * @type {boolean}
-     * @private
      */
     #isDragging: boolean = false
 
     /**
      * Creates a new Cube instance.
+     *
      * @param {Point3D} position - The 3D position of the cube.
      * @param {number} size - The size of the cube.
+     * @param {CubeCollection} cubeCollection - The collection of cubes that the cube belongs to.
+     * @param {Camera} camera - The camera that the cube will be rendered with.
+     * @param {Tilemap} tilemap - The tilemap that the cube is placed on.
+     * @param {Avatar} avatar - The avatar that can interact with the cube.
+     * @param {Tile} currentTile - The tile that the cube is currently on.
      */
-    constructor(position: Point3D, size: number) {
+    constructor(position: Point3D, size: number, currentTile: Tile, cubeCollection: CubeCollection, camera: Camera,
+        tilemap: Tilemap, avatar: Avatar) {
+
         this.#position = position
-
-        // Ensure the size is within a valid range
-        this.#size = Math.max(8, Math.min(size, TILE_DIMENSIONS.HEIGHT))
-
+        this.#size = size
+        this.#currentTile = currentTile
         this.#graphics = new CubeGraphics(this.#position, this.#size)
-    }
-
-    initialize(camera: Camera, tilemap: Tilemap,
-        cubeCollection: CubeCollection, currentTile: Tile | undefined): this {
-            
+        this.#cubeCollection = cubeCollection
         this.#camera = camera
         this.#tilemap = tilemap
-        this.#cubeCollection = cubeCollection
-        this.#currentTile = currentTile
+        this.#avatar = avatar
 
         this.#setupEventListeners()
-
-        return this
     }
 
     /**
      * Set up event listeners for interactivity.
-     * @private
      */
     #setupEventListeners(): void {
-        // Set event mode to 'dynamic' for proper event handling
         this.#graphics.eventMode = 'dynamic'
 
-        // Handle pointer events
         this.#graphics
             .on('pointerover', this.#handlePointerOver.bind(this))
             .on('pointerout', this.#handlePointerOut.bind(this))
@@ -120,137 +123,109 @@ export default class Cube {
 
     /**
      * Handle the pointerover event.
+     * 
      * @param {FederatedPointerEvent} event - The pointer event.
      * @returns {boolean | undefined}
-     * @private
      */
-    #handlePointerOver = (event: FederatedPointerEvent): boolean | undefined =>
-        // Emit the pointerover event on the cube's current tile graphics
-        this.#currentTile?.graphics.emit('pointerover', event)
+    #handlePointerOver = (event: FederatedPointerEvent): boolean | undefined => this.#currentTile?.graphics.emit('pointerover', event)
 
     /**
      * Handle the pointerout event.
+     * 
      * @param {FederatedPointerEvent} event - The pointer event.
      * @returns {boolean | undefined}
-     * @private
      */
-    #handlePointerOut = (event: FederatedPointerEvent): boolean | undefined =>
-        // Emit the pointerout event on the cube's current tile graphics
-        this.#currentTile?.graphics.emit('pointerout', event)
+    #handlePointerOut = (event: FederatedPointerEvent): boolean | undefined => this.#currentTile?.graphics.emit('pointerout', event)
 
     /**
      * Handle the start of dragging the cube.
-     * @private
      */
     #handleDragStart(): void {
-        // Reduce opacity to indicate dragging
         this.#graphics.alpha = 0.5
-
-        // Set dragging flag to true
         this.#isDragging = true
-
-        // Disable camera controls during dragging
         this.#camera.enabled = false
     }
 
     /**
      * Handle the movement of the cube during dragging.
+     * 
      * @param {FederatedPointerEvent} event - The pointer event.
-     * @private
      */
     #handleDragMove(event: FederatedPointerEvent): void {
         if (!this.#isDragging) return
 
-        // Emit pointerout event on the cube's current tile graphics
         this.#currentTile?.graphics.emit('pointerout', event)
 
-        // Convert pointer position to local coordinates of the tilemap
         const pointerPosition = this.#tilemap.tileContainer.toLocal(event)
+        const targetTile = this.#tilemap.findTileByPositionInBounds(pointerPosition)
 
-        // Get the tile at the new pointer position
-        const newTile = this.#tilemap.findTileByPositionInBounds(pointerPosition)
+        if (!targetTile ||
+            targetTile === this.#currentTile ||
+            targetTile === this.#avatar.currentTile) return
 
-        if (!newTile) return
+        this.#placeOnTile(targetTile)
 
-        this.#placeOnTile(newTile)
+        if (this.#avatar.isMoving) this.#avatar.calculatePath(true)
 
-        // Emit pointerover event on the new tile's graphics
-        newTile.graphics.emit('pointerover', event)
-
-        // Sort the cubes based on their positions
         this.#cubeCollection.sortCubesByPosition()
+        this.#cubeCollection.updateCubeRendering(this.#avatar)
+
+        this.currentTile?.graphics.emit('pointerover', event)
     }
 
     /**
      * Handle the end of dragging the cube.
-     * @private
      */
     #handleDragEnd(): void {
-        // Restore full opacity
         this.#graphics.alpha = 1
-
-        // Set dragging flag to false
         this.#isDragging = false
-
-        // Enable camera controls after dragging
         this.#camera.enabled = true
     }
 
     /**
      * Place the cube on a tile.
+     * 
      * @param {Tile} tile - The target tile.
-     * @private
      */
     #placeOnTile(tile: Tile): void {
-        // Check if the target tile is the same as the current tile; if so, exit without making changes
-        if (this.#currentTile?.position.equals(tile.position)) return
+        const tallestCube = this.#cubeCollection.findTallestCubeAt(tile.position)
 
-        // Find the tallest cube on the target tile, if any
-        const cubeOnTargetTile = this.#cubeCollection.findTallestCubeAt(tile.position, this)
+        if (tallestCube === this || tallestCube && this.#isLargerThan(tallestCube)) return
 
-        // Check if the current cube is bigger than the one on the target tile's stack; if so, exit without making changes
-        if (cubeOnTargetTile && this.#isLargerThan(cubeOnTargetTile)) return
+        const offsets = calculateCubeOffsets(this.#size)
+        const newPosition = tile.position.subtract(offsets)
 
-        // Calculate stacking offsets if there's a cube on the target tile's stack; otherwise, calculate tile offsets
-        const offsets = cubeOnTargetTile
-            ? calculateStackingOffsets(cubeOnTargetTile, this)
-            : calculateCubeOffsets(this.#size)
+        if (tallestCube) newPosition.z = tallestCube.position.z + tallestCube.size
 
-        // Calculate the new position based on the offsets
-        const newPosition = cubeOnTargetTile
-            ? cubeOnTargetTile.#position.add(offsets)
-            : tile.position.subtract(offsets)
+        this.#avatar.adjustPositionOnCubeDrag(this)
 
-        // Update the position
         this.#updatePosition(newPosition)
 
-        // Update the currentTile property
         this.#currentTile = tile
     }
 
     /**
      * Check if this cube is larger than another cube.
+     * 
      * @param {Cube} cube - The other cube to compare.
      * @returns {boolean} True if this cube is larger, false otherwise.
-     * @private
      */
-    #isLargerThan = (cube: Cube): boolean =>
-        this.#size > cube.#size
+    #isLargerThan = (cube: Cube): boolean => this.#size > cube.size
 
     /**
-     * Update the cube's position and graphics.
-     * @param {Point3D} position - The new position for the cube.
-     * @private
+     * Updates the cube's position and graphics based on the specified 3D position.
+     * 
+     * @param {Point3D} position - The new 3D position to set for the cube.
      */
     #updatePosition(position: Point3D): void {
         this.#position.copyFrom(position)
 
-        // Update the graphics position
         this.#graphics.position.set(position.x, position.y - position.z)
     }
 
     /**
      * Get the current position of the cube.
+     * 
      * @returns {Point3D} The current position.
      */
     get position(): Point3D {
@@ -259,6 +234,7 @@ export default class Cube {
 
     /**
      * Get the size of the cube.
+     * 
      * @returns {number} The size.
      */
     get size(): number {
@@ -267,6 +243,7 @@ export default class Cube {
 
     /**
      * Get the graphics object of the cube.
+     * 
      * @returns {CubeGraphics} The graphics object.
      */
     get graphics(): CubeGraphics {
@@ -275,6 +252,7 @@ export default class Cube {
 
     /**
      * Get the current tile the cube is on.
+     * 
      * @returns {Tile | undefined} The current tile.
      */
     get currentTile(): Tile | undefined {

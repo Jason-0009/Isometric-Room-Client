@@ -1,4 +1,4 @@
-import Point3D from '../utils/Point3D'
+import Point3D from '@utils/Point3D'
 
 /**
  * Represents the settings for a cube, including its tile position (Point3D)
@@ -8,7 +8,7 @@ export type CubeSettings = {
     /**
      * The tile position of the cube in 3D space.
      */
-    tilePoint: Point3D
+    position: Point3D
 
     /**
      * The size of the cube.
