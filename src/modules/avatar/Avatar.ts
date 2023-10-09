@@ -112,17 +112,22 @@ export default class Avatar {
         const tilePosition = this.#position.subtract(AVATAR_OFFSETS)
 
         this.#currentTile = this.#tilemap.findTileByExactPosition(tilePosition)
-
+        
         let newPosition = this.#getNewPosition(tilePosition)
 
         const tallestCubeAtTile = this.#cubeCollection.findTallestCubeAt(tilePosition)
 
-        if (tallestCubeAtTile && tallestCubeAtTile.size < AVATAR_DIMENSIONS.WIDTH)
-            newPosition = this.#getAdjustedNewPosition(tilePosition) || newPosition
+        const isCubeNarrowerThanAvatar = tallestCubeAtTile && tallestCubeAtTile.size < AVATAR_DIMENSIONS.WIDTH
+
+        if (isCubeNarrowerThanAvatar) {
+            const adjustedNewPosition = this.#getAdjustedNewPosition(tilePosition)
+
+            if (!adjustedNewPosition) return
+
+            newPosition = adjustedNewPosition
+        }
 
         this.#updatePosition(newPosition)
-
-        this.#cubeCollection.updateCubeRendering(this)
     }
 
     /**
@@ -224,10 +229,11 @@ export default class Avatar {
     #getAdjustedTilePosition(position: Point3D): Point3D | undefined {
         if (!this.#currentTile) return
 
-        const currentTilePosition = isometricToCartesian(this.#currentTile?.position)
-        const validTilePosition = findClosestValidTilePosition(currentTilePosition, this.#tilemap.grid)
+        const validTilePosition = findClosestValidTilePosition(isometricToCartesian(position), this.#tilemap.grid)
 
-        return cartesianToIsometric(validTilePosition || position)
+        if (!validTilePosition) return
+
+        return cartesianToIsometric(validTilePosition)
     }
 
     /**

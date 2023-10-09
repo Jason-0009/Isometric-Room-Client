@@ -68,7 +68,7 @@ export const AVATAR_OFFSETS: Point = new Point(
  * 
  * @type {Point3D}
  */
-export const AVATAR_INITIAL_POSITION: Point3D = new Point3D(1, 2, 0)
+export const AVATAR_INITIAL_POSITION: Point3D = new Point3D(0, 0, 0)
 
 /**
  * The speed of the avatar's movement in the 3D space.

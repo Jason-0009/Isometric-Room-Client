@@ -36,10 +36,10 @@ export const CUBE_COLORS: CubeColors = {
  * @type {CubeSettings[]}
  */
 export const CUBE_SETTINGS: CubeSettings[] = [
-    // { position: new Point3D(0, 0, 0), size: 16 },
-    { position: new Point3D(0, 0, 1), size: 32 },
-    // { position: new Point3D(2, 3, 0), size: 16 },
-    // { position: new Point3D(4, 6, 0), size: 24 },
-    // { position: new Point3D(4, 5, 0), size: 24 },
+    { position: new Point3D(2, 4, 0), size: 32 },
+    { position: new Point3D(2, 2, 0), size: 32 },
+    { position: new Point3D(0, 0, 0), size: 16 },
+    { position: new Point3D(4, 6, 0), size: 24 },
+    { position: new Point3D(4, 5, 0), size: 24 },
     { position: new Point3D(6, 0, 4), size: 24 }
 ]

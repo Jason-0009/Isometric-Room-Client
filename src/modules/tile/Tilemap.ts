@@ -75,6 +75,15 @@ export default class Tilemap {
             })
         })
     }
+
+    /**
+     * Retrieves the grid value at a specific position.
+     * 
+     * @param {Point} position - The position in the grid.
+     * @returns {number} The grid value at the specified position, or undefined if the position is not in the grid.
+     */
+    getGridValue = (position: Point): number => this.#grid[position.x]?.[position.y] ?? -1
+
     /**
      * Finds a tile at the specified exact position.
      * 

@@ -62,11 +62,6 @@ export default class Node {
     }
 
     /**
-     * Updates the fCost value of the node to the sum of its gCost and hCost values.
-    */
-    updateFCost = (): number => this.#fCost = this.#gCost + this.#hCost
-
-    /**
      * Get the position of the node.
      *
      * @type {Point3D}
@@ -113,7 +108,7 @@ export default class Node {
     set hCost(value: number) {
         this.#hCost = value
     }
-    
+
     /**
      * Get the total cost of the node.
      *
@@ -122,6 +117,15 @@ export default class Node {
      */
     get fCost(): number {
         return this.#fCost
+    }
+
+    /**
+     * This is a setter method for the fCost property of a Node.
+     *
+     * @param {number} value - The new value for the fCost property.
+     */
+    set fCost(value: number) {
+        this.#fCost = value
     }
 
     /**

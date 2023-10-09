@@ -64,7 +64,7 @@ export default class Scene {
      * 
      * @type {Avatar}
      */
-    readonly #avatar: Avatar
+    readonly #avatar: Avatar | undefined
 
     /**
      * The pathfinding algorithm used for finding paths on the tilemap grid.
@@ -86,7 +86,11 @@ export default class Scene {
         this.#entityContainer = new Container()
         this.#cubeCollection = new CubeCollection(this.#entityContainer)
         this.#pathfinder = new Pathfinder(this.#tilemap, this.#cubeCollection)
-        this.#avatar = new Avatar(calculateInitialAvatarPosition(this.#tilemap.grid), this.#tilemap, this.#cubeCollection, this.#pathfinder)
+
+        const initialAvatarPosition = calculateInitialAvatarPosition(this.#tilemap)
+
+        this.#avatar = initialAvatarPosition ? new Avatar(initialAvatarPosition, this.#tilemap,
+            this.#cubeCollection, this.#pathfinder) : undefined
 
         this.#initialize()
     }
@@ -95,6 +99,8 @@ export default class Scene {
      * Initializes the scene by adding containers and objects to the stage.
      */
     #initialize() {
+        this.#entityContainer.sortableChildren = true
+
         this.#initializeTilemap()
         this.#initializeCubeCollection()
         this.#initializeAvatar()
@@ -121,6 +127,8 @@ export default class Scene {
      * Initializes the tilemap
      */
     #initializeTilemap = () => {
+        if (!this.#avatar) return
+        
         this.#tilemap.avatar = this.#avatar
         this.#tilemap.generate()
     }
@@ -129,6 +137,8 @@ export default class Scene {
      * Initializes the cube collection.
      */
     #initializeCubeCollection = () => {
+        if (!this.#avatar) return
+
         this.#cubeCollection.populateSceneWithCubes(this.#camera, this.#tilemap, this.#avatar)
         this.#cubeCollection.sortCubesByPosition()
     }
@@ -138,7 +148,11 @@ export default class Scene {
      * This method sets up the avatar by calling its initialize method and adds it to the entity container.
      */
     #initializeAvatar() {
+        if (!this.#avatar) return
+
         this.#avatar.initialize()
+        
+        this.#cubeCollection.updateCubeRendering(this.#avatar)
 
         this.#entityContainer.addChild(this.#avatar.graphics)
     }
@@ -163,5 +177,5 @@ export default class Scene {
      * 
      * @param {number} delta - The time elapsed since the last frame, in milliseconds.
      */
-    #update = (delta: number) => this.#avatar.update(delta)
+    #update = (delta: number) => this.#avatar?.update(delta)
 }

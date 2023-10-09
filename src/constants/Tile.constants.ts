@@ -69,7 +69,7 @@ export const TILE_SURFACE_POINTS: number[] = [
  * @type {(number | null)[][]}
  */
 export const TILE_GRID: number[][] = [
-    [3, 1, 1, -1, 0],
+    [3, 1, 1, 0, 0],
     [1, -1, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],

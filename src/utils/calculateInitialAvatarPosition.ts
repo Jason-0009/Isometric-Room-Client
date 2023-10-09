@@ -5,17 +5,21 @@ import { isValidTilePosition, findClosestValidTilePosition } from '@utils/tilePo
 import { cartesianToIsometric } from '@utils/coordinateTransformations'
 
 import { AVATAR_INITIAL_POSITION, AVATAR_OFFSETS } from '@constants/Avatar.constants'
+import Tilemap from '@modules/tile/Tilemap'
 
 /**
- * Calculate the initial avatar position based on predefined settings.
- * 
- * @param {number[][]} grid - The grid containing tile heights.
- * @returns {Point3D} The initial avatar position in isometric coordinates.
+ * Calculates the initial position of the avatar based on predefined settings.
+ *
+ * @param {Tilemap} tilemap - The tilemap of the 3D grid.
+ * @returns {Point3D | undefined} - The initial avatar position in isometric coordinates. If no valid position is found, it returns `undefined`.
  */
-const calculateInitialAvatarPosition = (grid: number[][]): Point3D => {
-    let initialPosition = AVATAR_INITIAL_POSITION
+const calculateInitialAvatarPosition = (tilemap: Tilemap): Point3D | undefined => {
+    let initialPosition: Point3D | null = AVATAR_INITIAL_POSITION
 
-    if (!isValidTilePosition(initialPosition, grid)) initialPosition = findClosestValidTilePosition(initialPosition, grid) || initialPosition
+    if (!isValidTilePosition(initialPosition, tilemap))
+        initialPosition = findClosestValidTilePosition(initialPosition, tilemap.grid)
+
+    if (!initialPosition) return
 
     return cartesianToIsometric(initialPosition).add(AVATAR_OFFSETS)
 }

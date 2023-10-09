@@ -135,7 +135,6 @@ export default class Tile {
      * and initiating the calculation of a path to the goal position.
      */
     #handleClick = (): void => {
-        console.log({ clickedTile: isometricToCartesian(this.#position) })
         this.#avatar.goalPosition = isometricToCartesian(this.#position)
         this.#avatar.calculatePath()
     }

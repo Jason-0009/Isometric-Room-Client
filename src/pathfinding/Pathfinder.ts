@@ -20,10 +20,6 @@ import { TILE_DIMENSIONS } from '@constants/Tile.constants'
 export default class Pathfinder {
     /**
      * Represents a tilemap of the 3D grid. 
-     * The Tilemap class is used to manage and manipulate these tiles. 
-     * This property is used in various methods to check for obstacles. 
-     * The tiles in this tilemap can affect the pathfinding process. 
-     * For example, a tile might be an obstacle that needs to be avoided, or it might elevate the height of a node in the grid.
      *
      * @type {Tilemap} 
      */
@@ -31,13 +27,9 @@ export default class Pathfinder {
 
     /**
      * Represents a collection of cubes in the 3D grid. 
-     * The CubeCollection class is used to manage and manipulate these cubes. 
-     * This property is used in various methods within the Pathfinder class to check for obstacles and update node heights based on the cubes at their positions. 
-     * The cubes in this collection can affect the pathfinding process. 
-     * For example, a cube might be an obstacle that needs to be avoided, or it might elevate the height of a node in the grid.
-     
+     *
      * @type {CubeCollection} 
-    */
+     */
     readonly #cubeCollection: CubeCollection
 
     /**
@@ -117,8 +109,8 @@ export default class Pathfinder {
      * 
      * @returns {boolean} - Returns true if both the start and goal positions are valid and they are not the same. Otherwise, it returns false.
      */
-    #validateInput = (startPosition: Point3D, goalPosition: Point3D): boolean => isValidTilePosition(startPosition, this.#tilemap.grid) &&
-        isValidTilePosition(goalPosition, this.#tilemap.grid) && !startPosition.equals(goalPosition)
+    #validateInput = (startPosition: Point3D, goalPosition: Point3D): boolean => isValidTilePosition(startPosition, this.#tilemap) &&
+        isValidTilePosition(goalPosition, this.#tilemap) && !startPosition.equals(goalPosition)
 
     /**
      * Initializes an open list.
@@ -144,8 +136,7 @@ export default class Pathfinder {
     #createStartNode(startPosition: Point3D, goalPosition: Point3D): Node {
         const startNode = new Node(startPosition)
 
-        startNode.hCost = startPosition.distanceTo(goalPosition)
-        startNode.updateFCost()
+        startNode.fCost = startPosition.distanceTo(goalPosition)
 
         return startNode
     }
@@ -230,13 +221,13 @@ export default class Pathfinder {
                 position.y + offset.y
             )
 
-            const gridZ = this.#tilemap.grid[neighborGridPosition.x]?.[neighborGridPosition.y]
+            const gridZ = this.#tilemap.getGridValue(neighborGridPosition)
             const neighborPosition = new Point3D(neighborGridPosition.x, neighborGridPosition.y, gridZ)
 
             neighborPositions.push(neighborPosition)
         })
 
-        return neighborPositions.filter(neighborPoint => isValidTilePosition(neighborPoint, this.#tilemap.grid))
+        return neighborPositions.filter(position => isValidTilePosition(position, this.#tilemap))
     }
 
     /**
@@ -255,14 +246,19 @@ export default class Pathfinder {
 
         if (this.#isObstacle(neighborNode, currentNode) || this.#isPathObstructed(neighborNode, currentNode)) return
 
-        const existingNode = this.#findExistingNode(neighborNode, openList)
         const gCost = this.#calculateGCost(currentNode, neighborNode)
+        const hCost = neighborNode.position.distanceTo(goalPosition)
+        const fCost = gCost + hCost
 
-        if (existingNode && gCost >= existingNode.gCost) return
+        const existingNode = this.#findExistingNode(neighborNode, openList)
 
-        this.#updateNeighborNode(neighborNode, currentNode, gCost, goalPosition)
+        if (existingNode && fCost >= existingNode.fCost) return
 
-        if (!existingNode) openList.push(neighborNode)
+        this.#updateNeighborNode(neighborNode, gCost, hCost, fCost, currentNode)
+
+        if (existingNode) return
+
+        openList.push(neighborNode)
     }
 
     /**
@@ -274,7 +270,6 @@ export default class Pathfinder {
      */
     #isObstacle(node: Node, currentNode: Node): boolean {
         const nodePosition = cartesianToIsometric(node.position)
-
         const tallestCubeAtNode = this.#cubeCollection.findTallestCubeAt(nodePosition)
 
         /* Check if the size of the target cube is less than the width of the avatar.
@@ -314,6 +309,8 @@ export default class Pathfinder {
            it means that the path is not obstructed, so return false. 
         */
         return potentialObstaclePositions.every(position => {
+            if (!position) return
+            
             const tile = this.#tilemap.findTileByExactPosition(position)
             const cube = this.#cubeCollection.findTallestCubeAt(position)
 
@@ -342,7 +339,7 @@ export default class Pathfinder {
      * @param {Node} currentNode - The current node.
      * @returns {Point3D[]} - An array of two points that lie to the left and right of the target node.
      */
-    #getPotentialObstaclePositions(targetNode: Node, currentNode: Node): Point3D[] {
+    #getPotentialObstaclePositions(targetNode: Node, currentNode: Node): (Point3D | undefined)[] {
         const movementDirection = this.#calculateMovementDirection(targetNode, currentNode)
 
         const potentialObstaclePositions = [
@@ -372,12 +369,11 @@ export default class Pathfinder {
      * @param {Node} targetNode - The target node.
      * @param {Point} movementDirection - The movement direction from the current node to the target node.
      * @param {'left' | 'right'} side - The side of the target node where to calculate the obstacle position ('left' or 'right').
-     * @returns {Point3D} - The 3D position of the potential obstacle.
+     * @returns {Point3D | undefined} - The 3D position of the potential obstacle.
      */
-    #calculateObstaclePosition3D(targetNode: Node, movementDirection: Point, side: 'left' | 'right'): Point3D {
+    #calculateObstaclePosition3D(targetNode: Node, movementDirection: Point, side: 'left' | 'right'): Point3D | undefined {
         const obstaclePosition2D = this.#calculateObstaclePosition2D(targetNode, movementDirection, side)
-        const obstacleZ = this.#tilemap.grid[obstaclePosition2D.x]?.[obstaclePosition2D.y]
-
+        const obstacleZ = this.#tilemap.getGridValue(obstaclePosition2D)
         const obstaclePosition3D = new Point3D(obstaclePosition2D.x, obstaclePosition2D.y, obstacleZ)
 
         return cartesianToIsometric(obstaclePosition3D)
@@ -420,8 +416,8 @@ export default class Pathfinder {
     */
     #calculateGCost(currentNode: Node, neighborNode: Node): number {
         const delta = new Point(
-            Math.abs(currentNode.position.x - neighborNode.position.x),
-            Math.abs(currentNode.position.y - neighborNode.position.y),
+            Math.abs(neighborNode.position.x - currentNode.position.x),
+            Math.abs(neighborNode.position.y - currentNode.position.y),
         )
 
         const costOfMovement = delta.x - delta.y === 0 ? this.#DIAGONAL_COST * neighborNode.gCost :
@@ -429,19 +425,20 @@ export default class Pathfinder {
 
         return currentNode.gCost + costOfMovement
     }
-    
+
     /**
-     * Updates the costs and parent of the neighbor node.
+     * Updates the costs and parent of a neighboring node.
      *
-     * @param {Node} neighborNode - The neighbor node.
+     * @param {Node} neighborNode - The neighboring node whose properties are to be updated.
+     * @param {number} gCost - The cost from the start node to this neighboring node.
+     * @param {number} hCost - A heuristic estimate of the cost from this neighboring node to the goal.
+     * @param {number} fCost - The total cost of the node.
      * @param {Node} currentNode - The current node.
-     * @param {number} gCost - The calculated gCost for the neighbor node.
-     * @param {Point3D} goalPosition - The goal position of the path.
      */
-    #updateNeighborNode = (neighborNode: Node, currentNode: Node, gCost: number, goalPosition: Point3D): void => {
+    #updateNeighborNode = (neighborNode: Node, gCost: number, hCost: number, fCost: number, currentNode: Node): void => {
         neighborNode.gCost = gCost
-        neighborNode.hCost = neighborNode.position.distanceTo(goalPosition)
-        neighborNode.updateFCost()
+        neighborNode.hCost = hCost
+        neighborNode.fCost = fCost
         neighborNode.parent = currentNode
     }
 }

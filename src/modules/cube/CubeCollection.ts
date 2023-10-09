@@ -51,86 +51,43 @@ export default class CubeCollection {
      */
     populateSceneWithCubes = (camera: Camera, tilemap: Tilemap, avatar: Avatar): void =>
         CUBE_SETTINGS.forEach(({ position, size }) => {
-            position = this.getValidTilePosition(position, tilemap.grid)
-            size = this.getValidSize(size)
+            let validPosition = this.#getValidTilePosition(position, tilemap)
 
-            let tilePosition = cartesianToIsometric(position)
+            if (!validPosition) return
+
+            const validSize = this.#getValidSize(size)
+
+            let tilePosition = cartesianToIsometric(validPosition)
             let currentTile = tilemap.findTileByExactPosition(tilePosition)
 
             if (!currentTile) return
 
             let tallestCubeAtTile = this.findTallestCubeAt(currentTile.position)
 
-            if (tallestCubeAtTile && tallestCubeAtTile.size < size) ({
-                position, tilePosition,
-                currentTile, tallestCubeAtTile
-            } = this.updatePositions(position, tilemap))
+            const isCubeNarrower = tallestCubeAtTile && tallestCubeAtTile.size < validSize
 
-            const cubeOffsets = calculateCubeOffsets(size)
-            const finalPosition = this.getFinalCubePosition(tilePosition, cubeOffsets, tallestCubeAtTile)
+            if (isCubeNarrower) {
+                const data = this.#getClosestValidTileData(validPosition, tilemap)
+
+                if (!data) return
+
+                ({
+                    validPosition,
+                    tilePosition,
+                    currentTile,
+                    tallestCubeAtTile
+                } = data)
+            }
+
+            const cubeOffsets = calculateCubeOffsets(validSize)
+            const finalPosition = this.#getFinalCubePosition(tilePosition, cubeOffsets, tallestCubeAtTile)
 
             if (!currentTile) return
 
-            const cube = new Cube(finalPosition, size, currentTile, this, camera, tilemap, avatar)
+            const cube = new Cube(finalPosition, validSize, currentTile, this, camera, tilemap, avatar)
 
             this.#addCube(cube)
         })
-
-    /**
-     * Returns a valid tile position. If the provided position is not valid, it finds the closest valid tile position.
-     *
-     * @param {Point3D} position - The initial position.
-     * @param {number[][]} grid - The grid to validate against.
-     * @returns {Point3D} - The valid tile position.
-     */
-    getValidTilePosition = (position: Point3D, grid: number[][]): Point3D => isValidTilePosition(position, grid) ?
-        position : findClosestValidTilePosition(position, grid) || position
-
-    /**
-     * Returns a valid size. If the provided size is not within the allowed range, it adjusts it to fit within the range.
-     *
-     * @param {number} size - The initial size.
-     * @returns {number} - The valid size.
-     */
-    getValidSize = (size: number): number => Math.max(8, Math.min(size, TILE_DIMENSIONS.HEIGHT))
-
-    /**
-     * Updates the positions based on the provided position and tilemap. It finds the closest valid tile position if necessary.
-     *
-     * @param {Point3D} position - The initial position.
-     * @param {Tilemap} tilemap - The tilemap to use for finding positions.
-     * @returns {Object} - An object containing the updated positions and related variables.
-     */
-    updatePositions(position: Point3D, tilemap: Tilemap): {
-        position: Point3D
-        tilePosition: Point3D
-        currentTile: Tile | undefined
-        tallestCubeAtTile: Cube | null
-    } {
-        position = findClosestValidTilePosition(position, tilemap.grid) || position
-
-        const tilePosition = cartesianToIsometric(position)
-        const currentTile = tilemap.findTileByExactPosition(tilePosition)
-        const tallestCubeAtTile = this.findTallestCubeAt(tilePosition)
-
-        return { position, tilePosition, currentTile, tallestCubeAtTile: tallestCubeAtTile }
-    }
-
-    /**
-     * Returns the final cube position based on the provided tile position, cube offsets, and tallest cube at tile position.
-     *
-     * @param {Point3D} tilePosition - The initial tile position.
-     * @param {Point} cubeOffsets - The cube offsets to subtract from the tile position.
-     * @param {Cube | null} tallestCubeAtTile - The tallest cube at the tile position, if any.
-     * @returns {Point3D} - The final cube position.
-     */
-    getFinalCubePosition(tilePosition: Point3D, cubeOffsets: Point, tallestCubeAtTile: Cube | null): Point3D {
-        const finalPosition = tilePosition.subtract(cubeOffsets)
-
-        if (tallestCubeAtTile) finalPosition.z = tallestCubeAtTile.position.z + tallestCubeAtTile.size
-
-        return finalPosition
-    }
 
     /**
      * Finds the tallest cube at a specified tile position
@@ -181,6 +138,73 @@ export default class CubeCollection {
         })
 
         this.#entityContainer.sortChildren()
+    }
+
+    /**
+     * Returns a valid tile position based on the provided position and a tilemap.
+     * If the provided position is not valid in the tilemap, it finds the closest valid tile position in the tilemap grid.
+     * If no valid position is found, it defaults to the provided position.
+     *
+     * @param {Point3D} position - The initial position to validate.
+     * @param {Tilemap} tilemap - The tilemap of the 3D grid.
+     * @returns {Point3D | null} - A valid tile position in the grid. If no valid position is found, it returns null.
+     */
+    #getValidTilePosition = (position: Point3D, tilemap: Tilemap): Point3D | null => isValidTilePosition(position, tilemap) ?
+        position : findClosestValidTilePosition(position, tilemap.grid)
+
+    /**
+     * Returns a valid size. If the provided size is not within the allowed range, it adjusts it to fit within the range.
+     *
+     * @param {number} size - The initial size.
+     * @returns {number} - The valid size.
+     */
+    #getValidSize = (size: number): number => Math.max(8, Math.min(size, TILE_DIMENSIONS.HEIGHT))
+
+    /**
+     * Finds the closest valid tile data based on a given position and tilemap.
+     *
+     * @param {Point3D} position - The 3D point for which we want to find the closest valid tile data.
+     * @param {Tilemap} tilemap - The tilemap in which we are searching.
+     *
+     * @returns {Object} An object containing the following properties:
+     * - validPosition: The closest valid position in the tilemap grid to the given position.
+     * - tilePosition: The isometric position corresponding to the valid position.
+     * - currentTile: The tile at the tilePosition in the tilemap, if it exists.
+     * - tallestCubeAtTile: The tallest cube at the tilePosition, if it exists.
+     *
+     * If no valid position can be found, the function returns undefined.
+    */
+    #getClosestValidTileData(position: Point3D, tilemap: Tilemap): {
+        validPosition: Point3D,
+        tilePosition: Point3D,
+        currentTile: Tile | undefined
+        tallestCubeAtTile: Cube | null
+    } | undefined {
+        const validPosition = findClosestValidTilePosition(position, tilemap.grid)
+
+        if (!validPosition) return
+
+        const tilePosition = cartesianToIsometric(validPosition)
+        const currentTile = tilemap.findTileByExactPosition(tilePosition)
+        const tallestCubeAtTile = this.findTallestCubeAt(tilePosition)
+
+        return { validPosition, tilePosition, currentTile, tallestCubeAtTile }
+    }
+
+    /**
+     * Returns the final cube position based on the provided tile position, cube offsets, and tallest cube at tile position.
+     *
+     * @param {Point3D} tilePosition - The initial tile position.
+     * @param {Point} cubeOffsets - The cube offsets to subtract from the tile position.
+     * @param {Cube | null} tallestCubeAtTile - The tallest cube at the tile position, if any.
+     * @returns {Point3D} - The final cube position.
+     */
+    #getFinalCubePosition(tilePosition: Point3D, cubeOffsets: Point, tallestCubeAtTile: Cube | null): Point3D {
+        const finalPosition = tilePosition.subtract(cubeOffsets)
+
+        if (tallestCubeAtTile) finalPosition.z = tallestCubeAtTile.position.z + tallestCubeAtTile.size
+
+        return finalPosition
     }
 
     /**
