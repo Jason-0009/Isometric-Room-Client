@@ -179,11 +179,10 @@ export default class Avatar {
     adjustPositionOnCubeDrag = (cube: Cube): void => {
         if (!this.#currentTile || cube.currentTile !== this.#currentTile) return
 
-        const newPosition = this.#position
-
-        newPosition.z -= cube.size
-
-        this.#targetPosition?.copyFrom(newPosition)
+        const newPosition = this.#currentTile.position.add(AVATAR_OFFSETS)
+        const tallestCubeAtTile = this.#cubeCollection.findTallestCubeAt(this.#currentTile.position)
+        
+        newPosition.z += tallestCubeAtTile ? tallestCubeAtTile.position.z : 0
 
         this.#updatePosition(newPosition)
     }
