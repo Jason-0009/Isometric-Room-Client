@@ -160,8 +160,9 @@ export default class Pathfinder {
         const nodePosition = cartesianToIsometric(node.position)
         const tallestCubeAtNode = this.#cubeCollection.findTallestCubeAt(nodePosition)
 
-        /* Update the height of the node. The new height is the 
-           sum of the z-coordinate (vertical position) of the targetCube and its size.
+        /* Update the height of the node. The new height is determined by the following conditions:
+           - If there is a cube at the node, the height is the sum of the z-coordinate of the tallest cube and its size.
+           - Otherwise, the height is the sum of the z-coordinate of the node position and tile thickness.
         */
         node.height = tallestCubeAtNode ? tallestCubeAtNode.position.z + tallestCubeAtNode.size :
             nodePosition.z + TILE_DIMENSIONS.THICKNESS
