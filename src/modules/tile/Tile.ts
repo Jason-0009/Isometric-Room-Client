@@ -54,7 +54,7 @@ export default class Tile {
 
         const hasLeftBorder = this.#isBottomTileEmpty()
         const hasRightBorder = this.#isRightTileEmpty()
-        
+
         this.#graphics = new TileGraphics(this.#position, hasLeftBorder, hasRightBorder)
 
         this.#setupEventListeners()
@@ -107,34 +107,28 @@ export default class Tile {
 
     /**
      * Sets up event listeners for the tile's graphics.
-     * - 'pointerover': Triggered when the mouse pointer enters the tile.
-     * - 'pointerout': Triggered when the mouse pointer leaves the tile.
-     * - 'click': Triggered when the tile is clicked.
      */
     #setupEventListeners(): void {
         this.#graphics
             .on('pointerover', this.#handlePointerOver.bind(this))
             .on('pointerout', this.#handlePointerOut.bind(this))
-            .on('click', this.#handleClick.bind(this))
+            .on('pointerdown', this.#handlePointerDown.bind(this))
     }
 
     /**
      * Handles the 'pointerover' event (mouse pointer entering the tile).
-     * Creates a hover effect for the tile's graphics.
      */
     #handlePointerOver = (): void => this.#graphics.createHoverEffect()
 
     /**
      * Handles the 'pointerout' event (mouse pointer leaving the tile).
-     * Destroys the hover effect for the tile's graphics.
      */
     #handlePointerOut = (): void => this.#graphics.destroyHoverEffect()
 
     /**
-     * Handles a click event, setting the avatar's goal position to the current position
-     * and initiating the calculation of a path to the goal position.
+     * Handles a pointer down (click or touch) event.
      */
-    #handleClick = (): void => {
+    #handlePointerDown = (): void => {
         this.#avatar.goalPosition = isometricToCartesian(this.#position)
         this.#avatar.calculatePath()
     }
