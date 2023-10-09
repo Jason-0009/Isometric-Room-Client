@@ -95,8 +95,9 @@ export default class Pathfinder {
 
             closedList.add(currentNode)
 
-            if (currentNode.position.equals(goalPosition)) return this.#reconstructPath(currentNode)
             if (currentNode.fCost < closestNode.fCost) closestNode = currentNode
+
+            if (currentNode.position.equals(goalPosition)) return this.#reconstructPath(currentNode)
 
             this.#getNeighborNodes(currentNode).forEach(neighborNode => this.#processNeighborNode(neighborNode,
                 currentNode, openList, goalPosition))
@@ -143,7 +144,7 @@ export default class Pathfinder {
     #createStartNode(startPosition: Point3D, goalPosition: Point3D): Node {
         const startNode = new Node(startPosition)
 
-        startNode.fCost = startPosition.distanceTo(goalPosition)
+        startNode.hCost = startPosition.distanceTo(goalPosition)
         startNode.updateFCost()
 
         return startNode
@@ -254,16 +255,14 @@ export default class Pathfinder {
 
         if (this.#isObstacle(neighborNode, currentNode) || this.#isPathObstructed(neighborNode, currentNode)) return
 
-        const existingNode = openList.toArray().find((node) => node.position.equals(neighborNode.position))
+        const existingNode = this.#findExistingNode(neighborNode, openList)
+        const gCost = this.#calculateGCost(currentNode, neighborNode)
 
-        if (existingNode && neighborNode.fCost >= existingNode.fCost) return
+        if (existingNode && gCost >= existingNode.gCost) return
 
-        neighborNode.gCost = this.#calculateGCost(currentNode, neighborNode)
-        neighborNode.fCost = neighborNode.position.distanceTo(goalPosition)
-        neighborNode.updateFCost()
-        neighborNode.parent = currentNode
+        this.#updateNeighborNode(neighborNode, currentNode, gCost, goalPosition)
 
-        openList.push(neighborNode)
+        if (!existingNode) openList.push(neighborNode)
     }
 
     /**
@@ -307,24 +306,19 @@ export default class Pathfinder {
     #isPathObstructed(node: Node, currentNode: Node): boolean {
         if (!this.#isDiagonalMove(node, currentNode)) return false
 
-        const movementDirection = this.#calculateMovementDirection(node, currentNode)
+        const potentialObstaclePositions = this.#getPotentialObstaclePositions(node, currentNode)
 
-        // Calculate the positions of the nodes that are being bypassed during a diagonal move
-        const bypassedNodePositions = [
-            new Point3D(currentNode.position.x + movementDirection.x, currentNode.position.y, currentNode.position.z),
-            new Point3D(currentNode.position.x, currentNode.position.y + movementDirection.y, currentNode.position.z),
-        ]
-
-        // Check if either of the bypassed nodes is an obstacle
-        const isBypassingObstacle = bypassedNodePositions.some(position => {
-            const isometricPosition = cartesianToIsometric(position)
-            const tile = this.#tilemap.findTileByExactPosition(isometricPosition)
-            const cube = this.#cubeCollection.findTallestCubeAt(isometricPosition)
+        /* Check if there's a tile or a cube at either of these points.
+           If there's no tile or there's a cube at either point, it means that the path is obstructed, so return true. 
+           If there are tiles and no cubes at these points,
+           it means that the path is not obstructed, so return false. 
+        */
+        return potentialObstaclePositions.every(position => {
+            const tile = this.#tilemap.findTileByExactPosition(position)
+            const cube = this.#cubeCollection.findTallestCubeAt(position)
 
             return !tile || cube
         })
-
-        return isBypassingObstacle
     }
 
     /**
@@ -382,7 +376,7 @@ export default class Pathfinder {
      */
     #calculateObstaclePosition3D(targetNode: Node, movementDirection: Point, side: 'left' | 'right'): Point3D {
         const obstaclePosition2D = this.#calculateObstaclePosition2D(targetNode, movementDirection, side)
-        const obstacleZ = this.#tilemap.grid[obstaclePosition2D.x][obstaclePosition2D.y]
+        const obstacleZ = this.#tilemap.grid[obstaclePosition2D.x]?.[obstaclePosition2D.y]
 
         const obstaclePosition3D = new Point3D(obstaclePosition2D.x, obstaclePosition2D.y, obstacleZ)
 
@@ -407,13 +401,23 @@ export default class Pathfinder {
     }
 
     /**
-     * Calculate the G cost (movement cost) between the current node's position
-     * and a neighbor position.
-     * 
-     * @param {Node} currentNode - The current node.
-     * @param {Node} neighborNode - The neighbor.
-     * @returns {number} The G cost between the two positions.
+     * Finds an existing node in the open list that matches the position of the neighbor node.
+     *
+     * @param {Node} neighborNode - The neighbor node.
+     * @param {Heap<Node>} openList - The open list storing nodes to be explored.
+     * @returns {Node | undefined} - The existing node in the open list, or undefined if no matching node is found.
      */
+    #findExistingNode = (neighborNode: Node, openList: Heap<Node>): Node | undefined =>
+        openList.toArray().find((node) => node.position.equals(neighborNode.position))
+
+    /**
+    * Calculate the G cost (movement cost) between the current node's position
+    * and a neighbor position.
+    * 
+    * @param {Node} currentNode - The current node.
+    * @param {Node} neighborNode - The neighbor.
+    * @returns {number} The G cost between the two positions.
+    */
     #calculateGCost(currentNode: Node, neighborNode: Node): number {
         const delta = new Point(
             Math.abs(currentNode.position.x - neighborNode.position.x),
@@ -424,5 +428,20 @@ export default class Pathfinder {
             this.#HORIZONTAL_VERTICAL_COST * neighborNode.gCost
 
         return currentNode.gCost + costOfMovement
+    }
+    
+    /**
+     * Updates the costs and parent of the neighbor node.
+     *
+     * @param {Node} neighborNode - The neighbor node.
+     * @param {Node} currentNode - The current node.
+     * @param {number} gCost - The calculated gCost for the neighbor node.
+     * @param {Point3D} goalPosition - The goal position of the path.
+     */
+    #updateNeighborNode = (neighborNode: Node, currentNode: Node, gCost: number, goalPosition: Point3D): void => {
+        neighborNode.gCost = gCost
+        neighborNode.hCost = neighborNode.position.distanceTo(goalPosition)
+        neighborNode.updateFCost()
+        neighborNode.parent = currentNode
     }
 }

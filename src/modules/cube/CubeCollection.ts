@@ -52,10 +52,6 @@ export default class CubeCollection {
     populateSceneWithCubes = (camera: Camera, tilemap: Tilemap, avatar: Avatar): void =>
         CUBE_SETTINGS.forEach(({ position, size }) => {
             position = this.getValidTilePosition(position, tilemap.grid)
-
-            console.log({ position})
-
-            console.log({ position})
             size = this.getValidSize(size)
 
             let tilePosition = cartesianToIsometric(position)

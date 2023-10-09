@@ -114,11 +114,11 @@ export default class Avatar {
         this.#currentTile = this.#tilemap.findTileByExactPosition(tilePosition)
 
         let newPosition = this.#getNewPosition(tilePosition)
-        
+
         const tallestCubeAtTile = this.#cubeCollection.findTallestCubeAt(tilePosition)
 
-        if (tallestCubeAtTile &&
-            tallestCubeAtTile.size < AVATAR_DIMENSIONS.WIDTH) newPosition = this.#getAdjustedNewPosition(tilePosition) || newPosition
+        if (tallestCubeAtTile && tallestCubeAtTile.size < AVATAR_DIMENSIONS.WIDTH)
+            newPosition = this.#getAdjustedNewPosition(tilePosition) || newPosition
 
         this.#updatePosition(newPosition)
 

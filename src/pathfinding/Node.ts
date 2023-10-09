@@ -110,10 +110,10 @@ export default class Node {
      *
      * @param {number} value - The new heuristic cost from this node to the goal node.
      */
-    set fCost(value: number) {
+    set hCost(value: number) {
         this.#hCost = value
     }
-
+    
     /**
      * Get the total cost of the node.
      *
