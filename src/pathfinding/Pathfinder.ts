@@ -384,7 +384,7 @@ export default class Pathfinder {
      * 
      * @param {Node} targetNode - The target node.
      * @param {Point} movementDirection - The movement direction from the current node to the target node.
-     * @param {'left' | 'right'} side - The side of the target node where to calculate the obstacle position ('left' or 'right').
+     * @param {'left' | 'right'} side - The side of the target node where to calculate the obstacle position.
      * @returns {Point} - The 2D position of the potential obstacle.
      */
     #calculateObstaclePosition2D(targetNode: Node, movementDirection: Point, side: 'left' | 'right'): Point {
