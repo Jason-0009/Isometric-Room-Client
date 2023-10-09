@@ -45,7 +45,7 @@ module.exports = {
 
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Isometric tilemap'
+            title: 'Isometric projection'
         })
     ]
 }
