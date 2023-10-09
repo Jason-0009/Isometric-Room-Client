@@ -58,9 +58,6 @@ export default class Pathfinder {
 
     /**
      * Finds a path from the start position to the goal position in the 3D grid using the A* algorithm.
-     * The method uses a min heap to store nodes to be explored, sorted by their estimated total cost (fCost).
-     * If a path to the goal is not found and `isRecalculating` is true, it returns a path to the closest reachable node.
-     * If a path to the goal is not found and `isRecalculating` is false, it returns null.
      *
      * @param {Point3D} startPosition - The starting position of the path.
      * @param {Point3D} goalPosition - The goal position to reach
