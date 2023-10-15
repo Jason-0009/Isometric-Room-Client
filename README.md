@@ -1,9 +1,9 @@
-# Isometric projection
+# Isometric Projection
 
 ## Overview
 Toolkit for rendering isometric projections on a 2D canvas using PixiJS. It transforms 3D objects into a 2D space, creating an engaging visual experience.
 
-## Getting started
+## Getting Started
 
 ### Prerequisites
 - Node.js and npm installed on your machine.
