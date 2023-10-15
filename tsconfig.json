@@ -12,6 +12,7 @@
             "@core/*": ["core/*"],
             "@modules/*": ["modules/*"],
             "@pathfinding/*": ["pathfinding/*"],
+            "@shared/*": ["shared/*"],
             "@utils/*": ["utils/*"]
         }
     }

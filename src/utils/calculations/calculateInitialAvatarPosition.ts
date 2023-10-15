@@ -1,18 +1,12 @@
-import Point3D from '@utils/Point3D'
+import Point3D from '@utils/coordinates/Point3D'
 
-import { isValidTilePosition, findClosestValidTilePosition } from '@utils/tilePositionHelpers'
+import { isValidTilePosition, findClosestValidTilePosition } from '@utils/helpers/tilePositionHelpers'
 
-import { cartesianToIsometric } from '@utils/coordinateTransformations'
+import { cartesianToIsometric } from '@utils/coordinates/coordinateTransformations'
 
 import { AVATAR_INITIAL_POSITION, AVATAR_OFFSETS } from '@constants/Avatar.constants'
 import Tilemap from '@modules/tile/Tilemap'
 
-/**
- * Calculates the initial position of the avatar based on predefined settings.
- *
- * @param {Tilemap} tilemap - The tilemap of the 3D grid.
- * @returns {Point3D | undefined} - The initial avatar position in isometric coordinates. If no valid position is found, it returns `undefined`.
- */
 const calculateInitialAvatarPosition = (tilemap: Tilemap): Point3D | undefined => {
     let initialPosition: Point3D | null = AVATAR_INITIAL_POSITION
 

@@ -3,8 +3,6 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-    mode: 'development',
-
     devtool: 'source-map',
 
     entry: './src/index.ts',
@@ -21,6 +19,7 @@ module.exports = {
             "@core": path.resolve(__dirname, 'src/core'),
             "@modules": path.resolve(__dirname, 'src/modules'),
             "@pathfinding": path.resolve(__dirname, 'src/pathfinding'),
+            "@shared": path.resolve(__dirname, 'src/shared'),
             "@utils": path.resolve(__dirname, 'src/utils')
         }
     },

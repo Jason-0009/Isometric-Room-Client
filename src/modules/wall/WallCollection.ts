@@ -1,46 +1,27 @@
 import { Container } from 'pixi.js'
 
-import Wall from '@modules/wall/Wall'
 import WallDirection from '@modules/wall/WallDirection'
+import Wall from '@modules/wall/Wall'
 
-import Point3D from '@utils/Point3D'
+import Point3D from '@utils/coordinates/Point3D'
 
-/**
- * Represents a collection of walls in the game.
- */
 export default class WallCollection {
-    /**
-     * The container for holding the walls.
-     * 
-     * @type {Container}
-     */
-    readonly #wallContainer: Container
+    readonly #walls: Wall[]
+    readonly #container: Container
 
-    /**
-     * Creates a new instance of WallCollection.
-     */
     constructor() {
-        this.#wallContainer = new Container()
+        this.#walls = []
+        this.#container = new Container()
     }
 
-    /**
-     * Adds a wall to the collection.
-     * 
-     * @param {Point3D} position - The position of the wall.
-     * @param {WallDirection} direction - The direction of the wall.
-     */
-    addWall(position: Point3D, direction: WallDirection): void {
-        const wall = new Wall(position, direction)
+    addWall(position: Point3D, direction: WallDirection) {
+        const wall = new Wall(position, direction, this.#walls)
         
-        this.#wallContainer.addChild(wall)
+        this.#walls.push(wall)
+        this.#container.addChild(wall.container)
     }
 
-    /**
-     * Gets the container holding the walls.
-     * 
-     * @returns {Container} The container for walls.
-     */
-    get wallContainer(): Container {
-        return this.#wallContainer
+    get container(): Container {
+        return this.#container
     }
 }
