@@ -7,7 +7,7 @@ import Avatar from '@modules/avatar/Avatar'
 
 import { cartesianToIsometric } from '@utils/coordinates/coordinateTransformations'
 import Point3D from '@utils/coordinates/Point3D'
-import calculateWallDirections from '@utils/calculations/calculateWallDirection'
+import calculateWallDirections from '@utils/calculations/calculateWallDirections'
 
 export default class Tilemap {
     readonly #tiles: Tile[]
