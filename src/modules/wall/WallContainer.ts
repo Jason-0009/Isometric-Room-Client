@@ -29,8 +29,7 @@ export default class WallContainer extends Container {
         const sides: BoxFaces[] = []
         const directions = [WallDirection.LEFT, WallDirection.RIGHT]
 
-        directions.forEach(direction => this.#direction === direction ||
-            this.#direction === WallDirection.BOTH ? sides.push(this.#createSide(direction)) : null)
+        directions.forEach(direction => this.#direction === direction ? sides.push(this.#createSide(direction)) : null)
 
         return sides
     }

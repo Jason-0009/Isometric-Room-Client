@@ -7,7 +7,7 @@ import Avatar from '@modules/avatar/Avatar'
 
 import { cartesianToIsometric } from '@utils/coordinates/coordinateTransformations'
 import Point3D from '@utils/coordinates/Point3D'
-import calculateWallDirection from '@utils/calculations/calculateWallDirection'
+import calculateWallDirections from '@utils/calculations/calculateWallDirection'
 
 export default class Tilemap {
     readonly #tiles: Tile[]
@@ -30,9 +30,9 @@ export default class Tilemap {
 
                 const position = new Point3D(x, y, z)
                 const isometricPosition = cartesianToIsometric(position)
-                const wallDirection = calculateWallDirection(x, y)
+                const wallDirections = calculateWallDirections(x, y)
 
-                if (wallDirection) this.#wallCollection.addWall(isometricPosition, wallDirection)
+                wallDirections.forEach(wallDirection => this.#wallCollection.addWall(isometricPosition, wallDirection))
 
                 this.#addTile(isometricPosition)
             })

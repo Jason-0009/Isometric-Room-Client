@@ -24,8 +24,12 @@ export default class Wall {
     #setupEventListeners = (): void => this.#container.sides.forEach(side =>
         side.forEach((face, key) => face?.on('rightclick', this.#handleFaceClick.bind(this, key))))
 
-    #handleFaceClick = (key: FaceKey): void => createColorInput(hexColor => this.#walls.forEach((wall) =>
-        wall.#container.sides.forEach(side => side.get(key)?.draw(hexColor))))
+    #handleFaceClick = (key: FaceKey): void => createColorInput(hexColor => this.#walls.forEach((wall) => {
+        if (wall.#direction === this.#direction) {
+            wall.#container.sides.forEach(side => side.get(key)?.draw(hexColor))
+        }
+    }))
+
 
     get container(): WallContainer {
         return this.#container
