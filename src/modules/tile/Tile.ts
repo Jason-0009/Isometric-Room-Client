@@ -1,7 +1,5 @@
 import { FederatedPointerEvent, Point, Polygon } from 'pixi.js'
 
-import { AdjustmentFilter } from 'pixi-filters'
-
 import TileContainer from '@modules/tile/TileContainer'
 
 import Avatar from '@modules/avatar/Avatar'
@@ -11,6 +9,7 @@ import { FaceKey } from 'types/BoxFaces.types'
 import Point3D from '@utils/coordinates/Point3D'
 import { isometricToCartesian } from '@utils/coordinates/coordinateTransformations'
 import createColorInput from '@utils/helpers/colorInputHelper'
+import darkenColor from '@utils/color/darkenColor'
 
 import { TILE_SURFACE_POINTS } from '@constants/Tile.constants'
 
@@ -21,16 +20,18 @@ export default class Tile {
     readonly #container: TileContainer
     readonly #avatar: Avatar
 
+    #originalTint: number | null = null
+    #isDarkened: boolean = false
+
     constructor(position: Point3D, tiles: Tile[], grid: number[][], avatar: Avatar) {
         this.#position = position
         this.#tiles = tiles
         this.#grid = grid
         this.#avatar = avatar
 
-        const hasLeftBorder = this.#isTileEmpty(new Point(0, 1))
-        const hasRightBorder = this.#isTileEmpty(new Point(1, 0))
+        const hasBorders = this.#getBorders()
 
-        this.#container = new TileContainer(this.#position, hasLeftBorder, hasRightBorder)
+        this.#container = new TileContainer(this.#position, ...hasBorders)
 
         this.#setupEventListeners()
     }
@@ -44,9 +45,12 @@ export default class Tile {
         return polygon.contains(position.x, position.y)
     }
 
+    #getBorders(): [boolean, boolean] {
+        return [this.#isTileEmpty(new Point(0, 1)), this.#isTileEmpty(new Point(1, 0))]
+    }
+
     #isTileEmpty(delta: Point): boolean {
         const { x, y, z } = isometricToCartesian(this.#position)
-
         const nextRow = this.#grid[x + delta.x]
 
         if (!nextRow) return true
@@ -66,17 +70,20 @@ export default class Tile {
             .on('pointerout', this.#handlePointerOut.bind(this))
     }
 
-    #handleFaceClick = (key: FaceKey): void => createColorInput(hexColor => this.#tiles.forEach(tile =>
-        tile.graphics.faces.get(key)?.draw(hexColor)))
+    #handleFaceClick = (key: FaceKey): void =>
+        createColorInput(hexColor => this.#tiles.forEach(tile =>
+            tile.graphics.faces.get(key)?.draw(hexColor)))
 
     #handlePointerOver(): void {
         const surface = this.#container.faces.get('top')
 
-        if (!surface) return
+        if (!surface || this.#isDarkened) return
 
-        const adjustmentFilter = new AdjustmentFilter({ brightness: 0.8 })
+        this.#originalTint = this.#originalTint || surface.tint as number
 
-        surface.filters = [adjustmentFilter]
+        surface.tint = darkenColor(surface.tint as number, 10)
+
+        this.#isDarkened = true
     }
 
     #handlePointerDown = (event: FederatedPointerEvent): void => {
@@ -89,9 +96,11 @@ export default class Tile {
     #handlePointerOut() {
         const surface = this.#container.faces.get('top')
 
-        if (!surface) return
+        if (!surface || !this.#originalTint) return
 
-        surface.filters = []
+        surface.tint = this.#originalTint
+
+        this.#isDarkened = false
     }
 
     get graphics(): TileContainer {
