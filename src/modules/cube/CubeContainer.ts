@@ -6,7 +6,7 @@ import { BoxFaces } from 'types/BoxFaces.types'
 
 import Point3D from '@utils/coordinates/Point3D'
 
-import { CUBE_COLORS } from '@constants/Cube.constants'
+import { CUBE_FACE_COLORS } from '@constants/Cube.constants'
 
 export default class CubeContainer extends Container {
     readonly #size: number
@@ -18,9 +18,9 @@ export default class CubeContainer extends Container {
         this.position.set(position.x, position.y - position.z)
         this.#size = size
         this.#faces = new Map([
-            ['top', new PolygonGraphics(CUBE_COLORS.TOP_FACE, this.#topFacePoints)],
-            ['left', new PolygonGraphics(CUBE_COLORS.LEFT_FACE, this.#leftFacePoints)],
-            ['right', new PolygonGraphics(CUBE_COLORS.RIGHT_FACE, this.#rightFacePoints)]
+            ['top', new PolygonGraphics(CUBE_FACE_COLORS.TOP_FACE, this.#topFacePoints)],
+            ['left', new PolygonGraphics(CUBE_FACE_COLORS.LEFT_FACE, this.#leftFacePoints)],
+            ['right', new PolygonGraphics(CUBE_FACE_COLORS.RIGHT_FACE, this.#rightFacePoints)]
         ])
 
         this.#faces.forEach(face => face && this.addChild(face))

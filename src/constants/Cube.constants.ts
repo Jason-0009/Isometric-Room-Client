@@ -2,7 +2,7 @@ import { CubeSettings, CubeFaceColors } from 'types/Cube.types'
 
 import Point3D from '@utils/coordinates/Point3D'
 
-export const CUBE_COLORS: CubeFaceColors = {
+export const CUBE_FACE_COLORS: CubeFaceColors = {
     TOP_FACE: 0xFF5733, // Orange
     LEFT_FACE: 0x3399FF, // Blue
     RIGHT_FACE: 0xFFD700, // Yellow
