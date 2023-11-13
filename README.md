@@ -1,7 +1,7 @@
 # Isometric room client
 
 ## Overview
-Isometric room client is a TypeScript application that draws an isometric room with cubes that act like objects and another as an avatar that can move and interact with objects. It is built on top of PixiJS, the fastest, most flexible 2D WebGL renderer.
+TypeScript application that draws an isometric room with cubes that act like objects and another as an avatar that can move and interact with objects. It is built on top of PixiJS, the fastest, most flexible 2D WebGL renderer.
 
 ## Getting started
 
