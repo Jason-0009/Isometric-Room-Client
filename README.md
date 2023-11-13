@@ -5,6 +5,7 @@ This TypeScript application is a fun and interactive way to explore the world of
 - Draws an isometric room with cubes that act like objects.
 - An avatar that can move and interact with objects in the room.
 - Objects can be moved around.
+- Cubes can be customized with the color picker.
 
 ## Getting started
 
