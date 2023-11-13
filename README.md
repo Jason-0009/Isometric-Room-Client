@@ -1,9 +1,9 @@
 # Isometric room client
 
 ## Features
-1. Draws an isometric room with cubes that act like objects
-2. An avatar that can move and interact with objects in the room
-3. The avatar can pick up objects, move them around, and drop them
+- Draws an isometric room with cubes that act like objectsm
+- An avatar that can move and interact with objects in the room.
+- Objects can be moved around.
 
 ## Getting started
 
