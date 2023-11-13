@@ -44,7 +44,7 @@ module.exports = {
 
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Isometric projection'
+            title: 'Isometric room client'
         })
     ]
 }
