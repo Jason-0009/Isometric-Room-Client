@@ -1,5 +1,5 @@
 # Isometric room client
-This TypeScript application is a fun and interactive way to explore the world of isometric rooms and 2D WebGL rendering. The application is built on top of PixiJS, which is a 2D WebGL renderer that is known for its speed and flexibility.
+This TypeScript application is a fun and interactive way to explore the world of isometric rooms and 2D WebGL rendering. It is built on top of PixiJS, which is a 2D WebGL renderer that is known for its speed and flexibility.
 
 ## Features
 - Draws an isometric room with cubes that act like objects.
