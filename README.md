@@ -1,7 +1,7 @@
-# Isometric projection
+# Isometric room client
 
 ## Overview
-Toolkit for rendering isometric projections on a 2D canvas using PixiJS. It transforms 3D objects into a 2D space, creating an engaging visual experience.
+This is a client that draws an isometric room with cubes that act like objects and another as an avatar that can move and interact with objects. It is built on top of PixiJS, the fastest, most flexible 2D WebGL renderer.
 
 ## Getting started
 
