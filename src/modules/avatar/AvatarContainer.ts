@@ -15,6 +15,7 @@ export default class AvatarContainer extends Container {
         super()
 
         this.position.set(position.x, position.y - position.z)
+        
         this.#faces = new Map([
             ['top', new PolygonGraphics(AVATAR_COLORS.TOP_FACE, this.#topFacePoints)],
             ['left', new PolygonGraphics(AVATAR_COLORS.LEFT_FACE, this.#leftFacePoints)],
