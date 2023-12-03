@@ -15,6 +15,7 @@ export default class TileContainer extends Container {
         super()
 
         this.position.set(position.x, position.y - position.z)
+        
         this.#faces = new Map([
             ['top', new PolygonGraphics(TILE_COLORS.SURFACE, this.#surfacePoints)],
             ['left', hasLeftBorder ? new PolygonGraphics(TILE_COLORS.LEFT_BORDER, this.#leftBorderPoints) : null],
