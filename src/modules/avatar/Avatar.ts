@@ -58,6 +58,7 @@ export default class Avatar {
         }
 
         this.#updatePosition(newPosition)
+        
         this.#setupEventListeners()
     }
 
